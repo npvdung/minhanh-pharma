@@ -218,13 +218,15 @@
                     <span asp-validation-for="Sales.InvoiceDate" class="alert-danger"></span>
                 </div>
                 <div class="form-group col-md-6">
-                    @Html.HiddenFor(model =>model.Sales.UserId)
                     @Html.LabelFor(model => model.Sales.UserId, htmlAttributes: new { @class = "control-label" })
-                    @Html.DropDownListFor(model => model.Sales.UserId, new SelectList(ViewBag.account_lst, "Value","Text"),
-                    "Chọn người dùng",
-                    htmlAttributes: new { @id = "supplier", @class = "form-control col-md-4" })
+                    @Html.DropDownListFor(
+                        model => model.Sales.UserId,
+                        new SelectList(ViewBag.account_lst, "Value", "Text"),
+                        "Chọn người dùng",
+                        htmlAttributes: new { @id = "userId", @class = "form-control col-md-4" })
                     <span asp-validation-for="Sales.UserId" class="alert-danger"></span>
                 </div>
+
                 <div class="form-group col-md-6">
                     @Html.LabelFor(model => model.Sales.CustomerId, htmlAttributes: new { @class = "control-label" })
                     @Html.DropDownListFor(model => model.Sales.CustomerId, new SelectList(ViewBag.customer_lst,"Text", "Value"),

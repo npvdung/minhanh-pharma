@@ -20,7 +20,7 @@ namespace Base_Asp_Core_MVC_with_Identity.Areas.Identity.Data
             {
                 UserName = "admin@gmail.com",
                 Email = "admin@gmail.com",
-                FirstName = "Amdin",
+                FirstName = "Admin",
                 LastName = " ",
                 EmailConfirmed = true,
                 PhoneNumberConfirmed = true,
