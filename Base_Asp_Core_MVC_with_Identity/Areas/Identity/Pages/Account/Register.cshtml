@@ -1,0 +1,186 @@
+﻿@page
+@model RegisterModel
+@{
+    ViewData["Title"] = "Register";
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewData["Title"]</title>
+    <link href="https://fonts.googleapis.com/css?family=Poppins:600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+
+    <style>
+        /* Cài đặt nền và căn giữa form */
+        body {
+            background-color: #f2f2f2; /* Nền be nhẹ */
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        /* Định dạng hộp đăng ký */
+        .register-box {
+            background-color: white;
+            width: 100%;
+            max-width: 800px;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+
+            /* Tiêu đề form */
+            .register-box h2 {
+                font-size: 32px;
+                font-weight: 600;
+                color: #333;
+                text-align: center;
+                margin-bottom: 25px;
+            }
+
+        /* Định dạng các cột nhập liệu */
+        .form-row {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .form-group {
+            flex: 1;
+            min-width: 300px;
+            padding: 15px;
+        }
+
+            .form-group label {
+                font-size: 16px;
+                font-weight: 500;
+                color: #333;
+                display: block;
+                margin-bottom: 8px;
+            }
+
+            /* Định dạng các input */
+            .form-group input {
+                width: 100%;
+                padding: 12px;
+                font-size: 16px;
+                border: 2px solid #ddd;
+                border-radius: 8px;
+                background-color: #fafafa;
+                transition: all 0.3s ease;
+            }
+
+                .form-group input:focus {
+                    border-color: #ff7043;
+                    background-color: #fff;
+                    outline: none;
+                }
+
+        /* Định dạng nút đăng ký */
+        .btn-submit {
+            width: 100%;
+            padding: 14px;
+            background-color: #ff7043; /* Màu cam */
+            color: white;
+            font-size: 18px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+            .btn-submit:hover {
+                background-color: #e64a19;
+            }
+
+        /* Định dạng link đăng nhập */
+        .login-link {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+            .login-link a {
+                font-size: 16px;
+                color: #ff7043;
+                text-decoration: none;
+                font-weight: 500;
+                transition: color 0.3s ease;
+            }
+
+                .login-link a:hover {
+                    color: #e64a19;
+                }
+
+        /* Định dạng lỗi */
+        .text-danger {
+            font-size: 14px;
+            color: #e53935;
+            margin-top: 5px;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="register-container">
+        <div class="register-box">
+            <h2>Đăng ký tài khoản mới</h2>
+            <form id="registerForm" asp-route-returnUrl="@Model.ReturnUrl" method="post">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="Input_Email">Email</label>
+                        <input asp-for="Input.Email" class="form-control" type="email" id="Input_Email" placeholder="Nhập email của bạn" required>
+                        <span asp-validation-for="Input.Email" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label for="Input_FirstName">Họ và tên</label>
+                        <input asp-for="Input.FirstName" class="form-control" type="text" id="Input_FirstName" placeholder="Nhập họ của bạn" required>
+                        <span asp-validation-for="Input.FirstName" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="Input_LastName">Chức vụ</label>
+                        <input asp-for="Input.LastName" class="form-control" type="text" id="Input_LastName" placeholder="Nhập tên của bạn" required>
+                        <span asp-validation-for="Input.LastName" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label for="Input_PhoneNumber">Số điện thoại</label>
+                        <input asp-for="Input.PhoneNumber" class="form-control" type="text" id="Input_PhoneNumber" placeholder="Nhập số điện thoại" required>
+                        <span asp-validation-for="Input.PhoneNumber" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="Input_Password">Mật khẩu</label>
+                        <input asp-for="Input.Password" class="form-control" type="password" id="Input_Password" placeholder="Nhập mật khẩu" required>
+                        <span asp-validation-for="Input.Password" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label for="Input_ConfirmPassword">Nhập lại mật khẩu</label>
+                        <input asp-for="Input.ConfirmPassword" class="form-control" type="password" id="Input_ConfirmPassword" placeholder="Nhập lại mật khẩu" required>
+                        <span asp-validation-for="Input.ConfirmPassword" class="text-danger"></span>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-submit">Đăng ký</button>
+                <div class="login-link">
+                    <a asp-page="./Login">Đã có tài khoản? Đăng nhập</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</body>
+
+
+
+</html>

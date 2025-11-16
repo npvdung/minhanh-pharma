@@ -1,0 +1,94 @@
+﻿/* CSS cho giao diện màu cam và trắng */
+.text-cam {
+    color: #ff7a00;
+}
+
+.btn-cam {
+    background-color: #ff7a00;
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    font-weight: bold;
+    font-size: 16px;
+    border-radius: 8px;
+    transition: background-color 0.3s;
+}
+
+    .btn-cam:hover {
+        background-color: #e06900;
+        color: #fff;
+    }
+
+.table-section {
+    width: 100%;
+    padding: 2% 2%;
+}
+
+.custom-table {
+    width: 100%;
+    margin: 0 auto;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+    /* Thiết lập chiều cao tối thiểu cho phần thân bảng để hiển thị ít nhất 5 hàng */
+    /*.custom-table tbody {
+        min-height: calc(5 * 5px);*/ /* 5 dòng, mỗi dòng cao khoảng 50px */
+        /*position: relative;
+    }
+
+        .custom-table tbody::after {
+            content: '';
+            display: block;
+            height: calc(5 * 5px);*/ /* Chiều cao tối thiểu để chứa 5 dòng */
+        /*}*/
+
+.table-header {
+    background-color: #ff7a00;
+}
+
+    .table-header th {
+        padding: 12px;
+        font-weight: bold;
+        color: #fff;
+    }
+
+.custom-table td, .custom-table th {
+    text-align: center;
+    padding: 12px;
+}
+
+.custom-table tbody tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+.custom-table tbody tr:hover {
+    background-color: #ffecd8;
+}
+
+.btn-primary, .btn-danger {
+    font-weight: bold;
+    padding: 8px 15px;
+    border-radius: 6px;
+    transition: transform 0.2s;
+}
+
+.btn-primary {
+    background-color: #ff7a00;
+    border: none;
+}
+
+    .btn-primary:hover {
+        background-color: #e06900;
+        transform: scale(1.05);
+    }
+
+.btn-danger {
+    background-color: #ff4d4d;
+    border: none;
+}
+
+    .btn-danger:hover {
+        background-color: #e03b3b;
+        transform: scale(1.05);
+    }

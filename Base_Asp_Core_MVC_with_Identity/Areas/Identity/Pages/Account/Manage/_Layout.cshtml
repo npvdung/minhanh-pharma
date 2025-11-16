@@ -1,0 +1,111 @@
+﻿@{
+    if (ViewData.TryGetValue("ParentLayout", out var parentLayout) && parentLayout != null)
+    {
+        Layout = parentLayout.ToString();
+    }
+    else
+    {
+        Layout = "/Areas/Identity/Pages/_Layout.cshtml";
+    }
+}
+<style>
+    /* Căn bản cho toàn bộ form profile */
+    .profile-form {
+        background-color: #fff;
+        padding: 30px;
+        border-radius: 10px;
+        box-shadow: 0px 5px 20px rgba(0, 0, 0, 0.1);
+        margin-top: 20px;
+    }
+
+    /* Cải thiện style cho các form group */
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+        .form-group label {
+            font-size: 14px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+    .form-control {
+        font-size: 16px;
+        padding: 12px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+        background-color: #f9f9f9;
+    }
+
+        .form-control:focus {
+            border-color: #ff7043;
+            outline: none;
+            background-color: #fff;
+        }
+
+    .text-danger {
+        font-size: 14px;
+        color: #e53935;
+        margin-top: 5px;
+    }
+
+    /* Nút Save thay đổi */
+    .btn-save {
+        width: 100%;
+        padding: 14px;
+        background-color: #ff7043;
+        color: white;
+        font-size: 18px;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
+
+        .btn-save:hover {
+            background-color: #e64a19;
+        }
+
+    /* Định dạng cho ảnh đại diện */
+    .profile-picture {
+        width: 100%;
+        height: 350px;
+        margin-bottom: 15px;
+        overflow: hidden;
+        border-radius: 10px;
+    }
+
+        .profile-picture img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 10px;
+        }
+
+    /* Điều chỉnh cho file input ảnh */
+    .form-control-file {
+        padding: 10px;
+        font-size: 16px;
+        border-radius: 8px;
+        border: 1px solid #ddd;
+        background-color: #f9f9f9;
+        transition: all 0.3s ease;
+    }
+
+</style>
+<div>
+    <div class="row">
+        @*<div class="col-md-3">
+        <partial name="_ManageNav" />
+        </div>*@
+        <div class="col-md-16">
+            @RenderBody()
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @RenderSection("Scripts", required: false)
+}

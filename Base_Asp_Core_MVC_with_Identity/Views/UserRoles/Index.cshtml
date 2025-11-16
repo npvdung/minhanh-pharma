@@ -1,0 +1,117 @@
+﻿@using Base_Asp_Core_MVC_with_Identity.Models
+@model List<Base_Asp_Core_MVC_with_Identity.Models.View.UserRolesViewModel>
+
+@{
+    ViewData["Title"] = "User Roles";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h1 class="text-cam">User Roles</h1>
+
+<div class="table-section">
+    <table class="table table-bordered custom-table">
+        <thead class="table-header">
+            <tr>
+                <th>First Name</th>
+                <th>Last Name</th>
+                <th>Email</th>
+                <th>Roles</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var user in Model)
+            {
+                <tr>
+                    <td>@user.FirstName</td>
+                    <td>@user.LastName</td>
+                    <td>@user.Email</td>
+                    <td>@string.Join(", ", user.Roles.ToList())</td>
+                    <td>
+                        <a class="btn btn-primary" asp-controller="UserRoles" asp-action="Manage" asp-route-userId="@user.UserId">Manage Roles</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+<style>
+    <style >
+    /* Table Section Styling */
+    .table-section {
+        margin-top: 20px;
+        background-color: #fafafa;
+        padding: 1.5rem;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    }
+
+    /* Table Styling */
+    .custom-table {
+        width: 100%;
+        border-collapse: collapse;
+        border-radius: 8px;
+        overflow: hidden;
+        border: 1px solid #f0f0f0;
+    }
+
+        .custom-table thead {
+            background-color: #ff7a00;
+            color: white;
+        }
+
+        .custom-table th, .custom-table td {
+            text-align: left;
+            padding: 12px 15px;
+        }
+
+        .custom-table th {
+            font-weight: 600;
+            font-size: 1rem;
+        }
+
+        .custom-table td {
+            font-size: 0.95rem;
+            color: #333;
+        }
+
+        .custom-table tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        .custom-table tr:hover {
+            background-color: #ffefdc;
+        }
+
+    /* Table Header Styling */
+    .table-header th {
+        background-color: #ff7a00;
+        color: white;
+        font-weight: bold;
+    }
+
+    /* Action Button Styling */
+    .btn-primary {
+        background-color: #ff7a00;
+        color: white;
+        border: none;
+        padding: 0.5rem 1rem;
+        font-size: 0.9rem;
+        border-radius: 6px;
+        transition: background-color 0.3s ease;
+        text-decoration: none;
+    }
+
+        .btn-primary:hover {
+            background-color: #e06f00;
+        }
+
+    /* Page Title Styling */
+    .text-cam {
+        color: #ff7a00;
+        font-size: 1.8rem;
+        font-weight: bold;
+        margin-bottom: 1rem;
+    }
+</style>

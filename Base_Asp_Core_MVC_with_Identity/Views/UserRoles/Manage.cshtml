@@ -1,0 +1,100 @@
+﻿@using Base_Asp_Core_MVC_with_Identity.Models.View;
+@model List<ManageUserRolesViewModel>
+
+@{
+    ViewData["Title"] = "Manage User Roles";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h1 class="text-cam">Manage User Roles</h1>
+<p class="mb-3">Add/Remove Roles for User: <strong>@ViewBag.UserName</strong></p>
+
+<form method="post" class="form-section">
+    <div class="card custom-card">
+        <div class="card-header bg-cam text-white">
+            <h2 class="mb-0">Manage Roles</h2>
+        </div>
+        <div class="card-body">
+            @for (int i = 0; i < Model.Count; i++)
+            {
+                <div class="form-check m-2">
+                    <input type="hidden" asp-for="@Model[i].RoleId" />
+                    <input type="hidden" asp-for="@Model[i].RoleName" />
+                    <input asp-for="@Model[i].Selected" class="form-check-input" id="role-check-@i" />
+                    <label class="form-check-label" asp-for="@Model[i].Selected" for="role-check-@i">
+                        @Model[i].RoleName
+                    </label>
+                </div>
+            }
+            <div asp-validation-summary="All" class="text-danger"></div>
+        </div>
+        <div class="card-footer d-flex justify-content-end">
+            <button type="submit" class="btn btn-cam me-2">Update</button>
+            <a asp-action="EditUser" asp-route-id="@ViewBag.userId" class="btn btn-secondary">Cancel</a>
+        </div>
+    </div>
+</form>
+<style>
+    .text-cam {
+    color: #ff7a00;
+}
+
+.form-section {
+    margin: 20px 0;
+}
+
+.custom-card {
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+}
+
+.card-header {
+    padding: 15px 20px;
+}
+
+.card-body {
+    padding: 20px;
+}
+
+.card-footer {
+    padding: 15px 20px;
+    background-color: #f9f9f9;
+    border-top: 1px solid #ddd;
+}
+
+.form-check-input {
+    margin-right: 10px;
+    accent-color: #ff7a00;
+}
+
+.btn-cam {
+    background-color: #ff7a00;
+    color: #fff;
+    border: none;
+    font-weight: bold;
+    padding: 8px 15px;
+    border-radius: 6px;
+    transition: transform 0.2s, background-color 0.2s;
+}
+
+.btn-cam:hover {
+    background-color: #e06900;
+    transform: scale(1.05);
+}
+
+.btn-secondary {
+    background-color: #6c757d;
+    color: #fff;
+    font-weight: bold;
+    padding: 8px 15px;
+    border-radius: 6px;
+    transition: transform 0.2s, background-color 0.2s;
+}
+
+.btn-secondary:hover {
+    background-color: #5a6268;
+    transform: scale(1.05);
+}
+
+</style>

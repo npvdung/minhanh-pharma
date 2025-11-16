@@ -1,0 +1,161 @@
+﻿@model Customer
+<style>
+    /* Container trung tâm với flexbox */
+    .form-wrapper {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 77vh;
+        background-color: #fafafa;
+    }
+
+    /* Form container đơn giản */
+    .form-container {
+        background: white;
+        border-radius: 8px;
+        padding: 2rem;
+        max-width: 900px;
+        width: 100%;
+        border: 1px solid #f0f0f0;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    }
+
+    /* Tiêu đề */
+    .form-title {
+        font-size: 1.6rem;
+        font-weight: 600;
+        color: #333;
+        text-align: center;
+        margin-bottom: 1rem;
+    }
+
+    /* Form content và label styling */
+    .form-content {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .control-label {
+        color: #333;
+        font-weight: 600;
+        font-size: 0.9rem;
+        margin-bottom: 0.5rem;
+    }
+
+    /* Input styling */
+    .form-control {
+        padding: 0.7rem;
+        font-size: 1rem;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        transition: border-color 0.3s ease;
+    }
+
+        .form-control:focus {
+            border-color: #ff7a00;
+            box-shadow: 0 2px 6px rgba(255, 122, 0, 0.1);
+        }
+
+    /* Button group styling */
+    .button-group {
+        display: flex;
+        justify-content: center;
+        gap: 1rem;
+        margin-top: 1.5rem;
+    }
+
+    /* Submit button styling */
+    .btn-submit {
+        background-color: #ff7a00;
+        color: white;
+        border: none;
+        padding: 0.6rem 1.2rem;
+        font-size: 1rem;
+        border-radius: 6px;
+        font-weight: 500;
+        transition: background-color 0.3s ease;
+    }
+
+        .btn-submit:hover {
+            background-color: #e06f00;
+        }
+
+    /* Cancel button styling */
+    .btn-cancel {
+        background-color: transparent;
+        color: #ff7a00;
+        border: 1px solid #ff7a00;
+        padding: 0.6rem 1.2rem;
+        font-size: 1rem;
+        border-radius: 6px;
+        font-weight: 500;
+        transition: background-color 0.3s ease, color 0.3s ease;
+    }
+
+        .btn-cancel:hover {
+            background-color: #ff7a00;
+            color: white;
+        }
+
+</style>
+
+<div class="form-wrapper">
+    <div class="form-container">
+        <h2 class="form-title">Cập nhật thông tin khách hàng</h2>
+        <form method="post" class="form-content">
+            <div class="row">
+
+
+                <div class="form-group col-md-6">
+                    @Html.LabelFor(model => model.CustomerCode, htmlAttributes: new { @class = "control-label" })
+                    <input type="text" class="form-control" asp-for="CustomerCode" readonly>
+                    <span asp-validation-for="CustomerCode" class="alert-danger"></span>
+                </div>
+                <div class="form-group col-md-6">
+                    @Html.LabelFor(model => model.FullName, htmlAttributes: new { @class = "control-label" })
+                    <input type="text" class="form-control" asp-for="FullName">
+                    <span asp-validation-for="FullName" class="alert-danger"></span>
+                </div>
+                <div class="form-group col-md-6">
+                    @Html.LabelFor(model => model.PhoneNumber, htmlAttributes: new { @class = "control-label" })
+                    <input type="text" class="form-control" asp-for="PhoneNumber">
+                    <span asp-validation-for="PhoneNumber" class="alert-danger"></span>
+                </div>
+                <div class="form-group col-md-6">
+                    @Html.LabelFor(model => model.Address, htmlAttributes: new { @class = "control-label" })
+                    <input type="text" class="form-control" asp-for="Address" placeholder="Nhập mô tả">
+                    <span asp-validation-for="Address" class="alert-danger"></span>
+                </div>
+                <div class="form-group col-md-6">
+                    @Html.LabelFor(model => model.Email, htmlAttributes: new { @class = "control-label" })
+                    <input type="email" class="form-control" asp-for="Email" placeholder="Nhập mô tả">
+                    <span asp-validation-for="Email" class="alert-danger"></span>
+                </div>
+                <div class="form-group col-md-6">
+                    @Html.LabelFor(model => model.DateOfBirth, htmlAttributes: new { @class = "control-label" })
+                    <input type="date" class="form-control" asp-for="DateOfBirth" placeholder="Nhập mô tả">
+                    <span asp-validation-for="DateOfBirth" class="alert-danger"></span>
+                </div>
+                <div class="form-group col-md-6">
+                    @Html.LabelFor(model => model.Desciption, htmlAttributes: new { @class = "control-label" })
+                    <input type="text" class="form-control" asp-for="Desciption" placeholder="Nhập mô tả">
+                    <span asp-validation-for="Desciption" class="alert-danger"></span>
+                </div>
+            </div>
+            <div class="button-group">
+                <button type="submit" class="btn-submit"><i class="bi bi-save"></i> Update</button>
+                <a asp-controller="Customer" asp-action="Index" class="btn-cancel">Back</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+
+
+@section Scripts{
+    @{
+        <partial name="_ValidationScriptsPartial" />
+    }
+}

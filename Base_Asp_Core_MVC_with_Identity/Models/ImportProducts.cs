@@ -1,0 +1,31 @@
+﻿using System.ComponentModel.DataAnnotations.Schema;
+
+namespace Base_Asp_Core_MVC_with_Identity.Models
+{
+    public class ImportProducts
+    {
+        [Key]
+        public Guid ID { get; set; }
+        [Required]
+        public string ImportProductId { get; set; }
+        [Required]
+        [Display(Name = "Tên sản phẩm")]
+        public string? ProduceId { get; set; }
+        [Required]
+        public string? Description { get; set; }
+        public DateTime? ProductionBatch { get; set; }
+        [Required]
+        public DateTime? ManufacturingDate { get; set; }
+        [Required]
+        public DateTime? ExpirationData { get; set; }
+        public string? Unit { get; set; }
+        public double? ConvertRate { get; set; }
+        [Required]
+        public int? Quantity { get; set; }
+        [NotMapped]
+        public decimal? Price { get; set; }
+        public decimal? ImportPrice { get; set; }
+        public decimal? TotalAmount { get; set; }
+        public string? UnitProductId { get; set; }
+    }
+}

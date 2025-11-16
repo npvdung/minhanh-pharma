@@ -1,0 +1,41 @@
+﻿@using Base_Asp_Core_MVC_with_Identity.Areas.Identity.Data;
+@inject SignInManager<UserSystemIdentity> SignInManager
+@{
+    var hasExternalLogins = (await SignInManager.GetExternalAuthenticationSchemesAsync()).Any();
+    ViewData["ActivePage"] = "Index"; // hoặc "Email", "ChangePassword", vv.
+}
+
+<ul class="nav flex-column">
+     <li class="nav-item">
+        <a class="nav-link" id="profile" asp-page="./Index">Profile</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link " id="email" asp-page="./Email">Email</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" id="email" asp-page="./Email">Email</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link @ManageNavPages.ChangePasswordNavClass(ViewContext)" id="change-password" asp-page="./ChangePassword">Password</a>
+    </li>
+    @if (hasExternalLogins)
+    {
+        <li class="nav-item">
+            <a class="nav-link @ManageNavPages.ExternalLoginsNavClass(ViewContext)" id="external-login" asp-page="./ExternalLogins">External Logins</a>
+        </li>
+    }
+    <li class="nav-item">
+        <a class="nav-link @ManageNavPages.TwoFactorAuthenticationNavClass(ViewContext)" id="two-factor" asp-page="./TwoFactorAuthentication">Two-factor Authentication</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link @ManageNavPages.PersonalDataNavClass(ViewContext)" id="personal-data" asp-page="./PersonalData">Personal Data</a>
+    </li>
+</ul>
+<style>
+    .active-nav-item {
+    background-color: #007bff; /* Màu nền của item active */
+    color: #fff; /* Màu chữ của item active */
+    font-weight: bold; /* Độ đậm của chữ của item active */
+}
+</style>
+
