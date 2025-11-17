@@ -131,7 +131,7 @@ namespace Base_Asp_Core_MVC_with_Identity.Controllers
             var master = new DisposalRecords()
             {
                ImportId = autoCode,
-               ExportDate = empobj.disposalRecordsMaster.ExportDate,
+               ExportDate = empobj.disposalRecordsMaster.ExportDate ?? DateTime.Now,
                UserId = empobj.disposalRecordsMaster.UserId,
                SupplierId = "0d413f2c-1d8d-4c9e-a237-c6abdfc12f2b",
                Description = empobj.disposalRecordsMaster.Description,

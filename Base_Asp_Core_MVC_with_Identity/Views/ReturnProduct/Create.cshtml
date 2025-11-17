@@ -298,34 +298,37 @@
             });
         });
         // Tính toán "Thành tiền" và cập nhật "Tổng tiền" của master
+        // Tính toán "Thành tiền" và cập nhật "Tổng tiền" của master
         function updateAmounts() {
             let totalAmountMaster = 0;
-            // Duyệt qua tất cả các dòng trong bảng
-            document.querySelectorAll('#details-table tbody tr').forEach(row => {
-                const quantity = parseFloat(row.querySelector('input[name$=".Quantity"]').value) || 0;
-                const importPrice = parseFloat(row.querySelector('input[name$=".TotalAmount"]').value) || 0;
 
-                // Tính thành tiền
-                const totalAmount = quantity * importPrice;
-                row.querySelector('input[name$=".TotalAmount"]').value = totalAmount.toFixed(2);
+            // Duyệt qua tất cả các dòng trong bảng chi tiết
+            document.querySelectorAll('#details-table tbody tr').forEach(row => {
+                const lineTotalInput = row.querySelector('input[name$=".TotalAmount"]');
+                const lineTotal = parseFloat(lineTotalInput && lineTotalInput.value) || 0;
 
                 // Cộng dồn vào tổng tiền master
-                totalAmountMaster += totalAmount;
+                totalAmountMaster += lineTotal;
             });
-            $('#TotalAmountMaster').val(totalAmountMaster.toFixed(2));
-            // Cập nhật tổng tiền master
+
+            // Gán lại vào ô tổng tiền master
+            const masterInput = document.getElementById('TotalAmountMaster');
+            if (masterInput) {
+                masterInput.value = totalAmountMaster.toFixed(2);
+            }
         }
+
 
         // Xử lý khi người dùng nhập dữ liệu vào các trường Quantity, ConvertRate, ImportPrice
         document.querySelector('#details-table').addEventListener('input', function (e) {
             if (
                 e.target.matches('input[name$=".Quantity"]') ||
-                e.target.matches('input[name$=".ConvertRate"]') ||
-                e.target.matches('input[name$=".Price"]')
+                e.target.matches('input[name$=".TotalAmount"]')
             ) {
-                updateAmounts(); // Gọi hàm cập nhật
+                updateAmounts();
             }
         });
+
 
         // Thêm dòng mới và gắn sự kiện tính toán
         document.querySelector('.btn-add-row').addEventListener('click', function () {
@@ -439,6 +442,7 @@
         // Khởi tạo Select2 cho tất cả các dropdown trong bảng khi trang load
         $(document).ready(function () {
             $('#details-table select').select2();
+            updateAmounts();
         });
 
         $(document).ready(function () {
