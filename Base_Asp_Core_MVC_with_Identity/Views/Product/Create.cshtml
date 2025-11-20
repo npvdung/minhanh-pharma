@@ -1,5 +1,13 @@
-﻿@using Base_Asp_Core_MVC_with_Identity.Models.View;
+﻿
+@using Base_Asp_Core_MVC_with_Identity.Models.View
+@using Microsoft.AspNetCore.Mvc.Rendering
 @model ProductViewModel
+
+@{
+    var categoryList = ViewData["CategoryList"] as IEnumerable<SelectListItem> ?? Enumerable.Empty<SelectListItem>();
+    var supplierList = ViewData["SupplierList"] as IEnumerable<SelectListItem> ?? Enumerable.Empty<SelectListItem>();
+}
+
 <style>
     .form-wrapper {
         display: flex;
@@ -209,15 +217,19 @@
                 </div>
                 <div class="form-group col-md-6">
                     @Html.LabelFor(model => model.productMaster.CategoryId, htmlAttributes: new { @class = "control-label col-md-4" })
-                    @Html.DropDownListFor(model => model.productMaster.CategoryId, new SelectList(ViewBag.category_lst, "Text", "Value"),
-                    "Chọn danh mục",
-                    htmlAttributes: new {@id = "category", @class ="form-control col-md-4" })
+                    @Html.DropDownListFor(
+                        model => model.productMaster.CategoryId,
+                        categoryList,
+                        "Chọn danh mục",
+                        htmlAttributes: new { @id = "category", @class = "form-control col-md-4" })
                 </div>
                 <div class="form-group col-md-6">
                     @Html.LabelFor(model => model.productMaster.SupplierId, htmlAttributes: new { @class = "control-label col-md-4" })
-                    @Html.DropDownListFor(model => model.productMaster.SupplierId, new SelectList(ViewBag.supplier_lst, "Text", "Value"),
-                    "Chọn nhà cung cấp",
-                    htmlAttributes: new {@id = "supplier", @class ="form-control col-md-4" })
+                    @Html.DropDownListFor(
+                        model => model.productMaster.SupplierId,
+                        supplierList,
+                        "Chọn nhà cung cấp",
+                        htmlAttributes: new { @id = "supplier", @class = "form-control col-md-4" })
                 </div>
                 <div class="form-group col-md-6">
                     @Html.LabelFor(model => model.productMaster.Unit, htmlAttributes: new { @class = "control-label col-md-4" })
@@ -255,14 +267,6 @@
                 </div>
             </div>
 
-            @*<select id="product-template" style="display: none;">
-                @foreach (var item in ViewBag.product_lst as List<SelectListItem>)
-                {
-                    <option value="@item.Value">@item.Text</option>
-                }
-            </select>*@
-
-            <!-- Details Section -->
             <h3 class="form-title">Chi tiết đơn vị sản phẩm</h3>
             <table id="details-table">
                 <thead>
@@ -274,51 +278,40 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <!-- JS sẽ thêm các dòng tại đây -->
                 </tbody>
             </table>
             <button type="button" class="btn-add-row">+ Thêm dòng</button>
 
-            <!-- Submit Section -->
             <div class="button-group">
                 <button type="submit" class="btn-submit"><i class="bi bi-save"></i> Tạo mới</button>
                 <a asp-controller="Product" asp-action="Index" class="btn btn-cancel">Trở về</a>
             </div>
         </form>
-
     </div>
 </div>
 
 @section Scripts{
-    @{
-        <partial name="_ValidationScriptsPartial" />
-    }
+    <partial name="_ValidationScriptsPartial" />
     <script>
-        // Thêm dòng mới và gắn sự kiện tính toán
         document.querySelector('.btn-add-row').addEventListener('click', function () {
             const tableBody = document.querySelector('#details-table tbody');
             const rowIndex = tableBody.querySelectorAll('tr').length;
 
             const newRow = `
-                                                    <tr>
-                                                    <td><input type="text" name="productUnits[${rowIndex}].UnitName" class="form-control" /></td>
-                                                    <td><input type="number" name="productUnits[${rowIndex}].Rate" class="form-control" /></td>
-                                                    <td><input type="number" name="productUnits[${rowIndex}].PriceBuy" class="form-control" /></td>
-                                                    <td><button type="button" class="btn-remove-row btn btn-danger">Xóa</button></td>
-                                                    </tr>`;
+                <tr>
+                    <td><input type="text" name="productUnits[${rowIndex}].UnitName" class="form-control" /></td>
+                    <td><input type="number" name="productUnits[${rowIndex}].Rate" class="form-control" /></td>
+                    <td><input type="number" name="productUnits[${rowIndex}].PriceBuy" class="form-control" /></td>
+                    <td><button type="button" class="btn-remove-row btn btn-danger">Xóa</button></td>
+                </tr>`;
 
             tableBody.insertAdjacentHTML('beforeend', newRow);
-
-            // Cập nhật lại tổng tiền nếu có thay đổi
-            updateAmounts();
         });
 
-        // Xóa dòng
         document.querySelector('#details-table').addEventListener('click', function (e) {
             if (e.target.classList.contains('btn-remove-row')) {
                 e.target.closest('tr').remove();
-                updateAmounts(); // Cập nhật lại tổng tiền master
             }
         });
     </script>
-    }
+}

@@ -5,12 +5,12 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h1 class="text-cam">Role Manager</h1>
+<h1 class="text-cam">Quản lý role</h1>
 
 <form method="post" asp-action="AddRole" asp-controller="RoleManager" class="my-4">
     <div class="input-group w-50 mx-auto">
         <input name="roleName" class="form-control" placeholder="Enter role name" />
-        <button class="btn btn-cam ms-2">Add New Role</button>
+        <button class="btn btn-cam ms-2">Thêm role mới</button>
     </div>
 </form>
 
@@ -19,7 +19,7 @@
         <thead class="table-header">
             <tr>
                 <th>ID</th>
-                <th>Role Name</th>
+                <th>Role</th>
                 @*<th>Actions</th>*@
             </tr>
         </thead>

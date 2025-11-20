@@ -1,5 +1,13 @@
-﻿@using Base_Asp_Core_MVC_with_Identity.Models.View;
+﻿@using Base_Asp_Core_MVC_with_Identity.Models.View
+@using Microsoft.AspNetCore.Mvc.Rendering
 @model ImportViewModel
+
+@{
+    var productList = ViewData["ProductList"] as IEnumerable<SelectListItem> ?? Enumerable.Empty<SelectListItem>();
+    var unitList    = ViewData["UnitList"]    as IEnumerable<SelectListItem> ?? Enumerable.Empty<SelectListItem>();
+    var accountList = ViewData["AccountList"] as IEnumerable<SelectListItem> ?? Enumerable.Empty<SelectListItem>();
+    var statusList  = ViewData["StatusList"]  as IEnumerable<SelectListItem> ?? Enumerable.Empty<SelectListItem>();
+}
 
 <style>
     .form-wrapper {
@@ -204,11 +212,9 @@
 
 <div class="form-wrapper">
     <div class="form-container">
-        <h2 class="form-title">Thêm mới Import</h2>
+        <h2 class="form-title">Thêm hàng vào kho</h2>
         <form method="post" id="import-form">
-            <!-- Master Section -->
             <div class="row">
-
                 <div class="form-group col-md-6">
                     @Html.LabelFor(model => model.ImportMaster.ImportCode, htmlAttributes: new { @class = "control-label" })
                     <input type="text" class="form-control" asp-for="ImportMaster.ImportCode">
@@ -226,9 +232,11 @@
                 </div>
                 <div class="form-group col-md-6">
                     @Html.LabelFor(model => model.ImportMaster.AccountId, htmlAttributes: new { @class = "control-label" })
-                    @Html.DropDownListFor(model => model.ImportMaster.AccountId, new SelectList(ViewBag.account_lst, "Value","Text"),
-                    "Chọn người dùng",
-                    htmlAttributes: new { @id = "supplier", @class = "form-control col-md-4" })
+                    @Html.DropDownListFor(
+                        model => model.ImportMaster.AccountId,
+                        accountList,
+                        "Chọn người dùng",
+                        htmlAttributes: new { @id = "supplier", @class = "form-control col-md-4" })
                     <span asp-validation-for="ImportMaster.AccountId" class="alert-danger"></span>
                 </div>
                 <div class="form-group col-md-6">
@@ -243,28 +251,29 @@
                 </div>
                 <div class="form-group col-md-6">
                     @Html.LabelFor(model => model.ImportMaster.Status, htmlAttributes: new { @class = "control-label" })
-                    @Html.DropDownListFor(model => model.ImportMaster.Status, new SelectList(ViewBag.status_lst,"Value","Text"),
-                    "Chọn trạng thái",
-                    htmlAttributes: new { @id = "supplier", @class = "form-control col-md-4" })
+                    @Html.DropDownListFor(
+                        model => model.ImportMaster.Status,
+                        statusList,
+                        "Chọn trạng thái",
+                        htmlAttributes: new { @id = "supplier", @class = "form-control col-md-4" })
                     <span asp-validation-for="ImportMaster.Status" class="alert-danger"></span>
                 </div>
             </div>
 
             <!-- Hidden Template for Dropdown -->
             <select id="product-template" style="display: none;">
-                @foreach (var item in ViewBag.product_lst as List<SelectListItem>)
+                @foreach (var item in productList)
                 {
                     <option value="@item.Value">@item.Text</option>
                 }
             </select>
             <select id="unit-template" style="display: none;">
-                @foreach (var item in ViewBag.unit_lst as List<SelectListItem>)
+                @foreach (var item in unitList)
                 {
                     <option value="@item.Value">@item.Text</option>
                 }
             </select>
 
-            <!-- Details Section -->
             <h3 class="form-title">Chi tiết sản phẩm</h3>
             <table id="details-table">
                 <thead>
@@ -280,13 +289,10 @@
                         <th style="background-color: #e06f00 !important; width: 70px;"></th>
                     </tr>
                 </thead>
-                <tbody>
-                    <!-- JS sẽ thêm các dòng tại đây -->
-                </tbody>
+                <tbody></tbody>
             </table>
             <button type="button" class="btn-add-row">+ Thêm dòng</button>
 
-            <!-- Submit Section -->
             <div class="button-group">
                 <button type="submit" class="btn-submit"><i class="bi bi-save"></i> Tạo mới</button>
                 <a asp-controller="ImportProduct" asp-action="Index" class="btn btn-cancel">Trở về</a>
@@ -296,6 +302,8 @@
 </div>
 
 @section Scripts {
+    @* Validation *@
+    <partial name="_ValidationScriptsPartial" />
     <script>
         $(document).ready(function () {
             $('.product-select').select2({
@@ -311,175 +319,130 @@
             });
         });
 
-        // Tính toán "Thành tiền" và cập nhật "Tổng tiền" của master
         function updateAmounts() {
             let totalAmountMaster = 0;
 
-            // Duyệt qua tất cả các dòng trong bảng
             document.querySelectorAll('#details-table tbody tr').forEach(row => {
                 const quantity = parseFloat(row.querySelector('input[name$=".Quantity"]').value) || 0;
-                const convertRate = parseFloat(row.querySelector('input[name$=".ConvertRate"]').value) || 0;
                 const importPrice = parseFloat(row.querySelector('input[name$=".ImportPrice"]').value) || 0;
 
-                // Tính thành tiền
                 const totalAmount = quantity * importPrice;
                 row.querySelector('input[name$=".TotalAmount"]').value = totalAmount.toFixed(2);
 
-                // Cộng dồn vào tổng tiền master
                 totalAmountMaster += totalAmount;
             });
             $('#TotalAmountMaster').val(totalAmountMaster.toFixed(2));
-            // Cập nhật tổng tiền master
         }
 
-        // Xử lý khi người dùng nhập dữ liệu vào các trường Quantity, ConvertRate, ImportPrice
         document.querySelector('#details-table').addEventListener('input', function (e) {
             if (
                 e.target.matches('input[name$=".Quantity"]') ||
                 e.target.matches('input[name$=".ConvertRate"]') ||
                 e.target.matches('input[name$=".ImportPrice"]')
             ) {
-                updateAmounts(); // Gọi hàm cập nhật
+                updateAmounts();
             }
         });
 
-        // Thêm dòng mới và gắn sự kiện tính toán
         document.querySelector('.btn-add-row').addEventListener('click', function () {
             const tableBody = document.querySelector('#details-table tbody');
             const rowIndex = tableBody.querySelectorAll('tr').length;
-            const targetDropdown = $('#slotBooking'); // Dropdown sản phẩm ẩn
+
             const newRow = `
-                                            <tr>
-                                                <td>
-                                                     <select name="ProductDetails[${rowIndex}].ProduceId" class="form-control product-select">
-                                                        <option value="">Select Product</option>
-                                                        ${document.getElementById('product-template').innerHTML}
-                                                    </select>
-                                                </td>
-                                                        <td><input type="date" name="ProductDetails[${rowIndex}].ManufacturingDate" class="form-control" /></td>
-                                                        <td><input type="date" name="ProductDetails[${rowIndex}].ExpirationData" class="form-control" /></td>
-                                                <td>
-                                                      <select name="ProductDetails[${rowIndex}].UnitProductId" class="form-control unit-select">
-                                                        <option value="">Select Unit</option>
-                                                        ${document.getElementById('unit-template').innerHTML}
-                                                    </select>
-                                                </td>
-                                                <td><input type="number" name="ProductDetails[${rowIndex}].ConvertRate" class="form-control" /></td>
-                                                <td><input type="number" name="ProductDetails[${rowIndex}].Quantity" class="form-control" /></td>
-                                                <td><input type="number" name="ProductDetails[${rowIndex}].ImportPrice" class="form-control" /></td>
-                                                <td><input type="number" name="ProductDetails[${rowIndex}].TotalAmount" class="form-control" readonly /></td>
-                                                <td><button type="button" class="btn-remove-row btn btn-danger">Xóa</button></td>
-                                            </tr>`;
+                <tr>
+                    <td>
+                        <select name="ProductDetails[${rowIndex}].ProduceId" class="form-control product-select">
+                            <option value="">Select Product</option>
+                            ${document.getElementById('product-template').innerHTML}
+                        </select>
+                    </td>
+                    <td><input type="date" name="ProductDetails[${rowIndex}].ManufacturingDate" class="form-control" /></td>
+                    <td><input type="date" name="ProductDetails[${rowIndex}].ExpirationData" class="form-control" /></td>
+                    <td>
+                        <select name="ProductDetails[${rowIndex}].UnitProductId" class="form-control unit-select">
+                            <option value="">Select Unit</option>
+                            ${document.getElementById('unit-template').innerHTML}
+                        </select>
+                    </td>
+                    <td><input type="number" name="ProductDetails[${rowIndex}].ConvertRate" class="form-control" /></td>
+                    <td><input type="number" name="ProductDetails[${rowIndex}].Quantity" class="form-control" /></td>
+                    <td><input type="number" name="ProductDetails[${rowIndex}].ImportPrice" class="form-control" /></td>
+                    <td><input type="number" name="ProductDetails[${rowIndex}].TotalAmount" class="form-control" readonly /></td>
+                    <td><button type="button" class="btn-remove-row btn btn-danger">Xóa</button></td>
+                </tr>`;
 
             tableBody.insertAdjacentHTML('beforeend', newRow);
 
-            // Khởi tạo Select2 cho dropdown mới thêm
             $('.product-select').select2({
                 placeholder: "Select Product",
                 allowClear: true,
-                width: '100%' // Đảm bảo dropdown có kích thước phù hợp
+                width: '100%'
             });
-
             $('.unit-select').select2({
                 placeholder: "Select Unit",
                 allowClear: true,
                 width: '100%'
             });
 
-            // Cập nhật lại tổng tiền nếu có thay đổi
             updateAmounts();
         });
 
-        // Xóa dòng
         document.querySelector('#details-table').addEventListener('click', function (e) {
             if (e.target.classList.contains('btn-remove-row')) {
                 e.target.closest('tr').remove();
-                updateAmounts(); // Cập nhật lại tổng tiền master
+                updateAmounts();
             }
         });
 
+        // phần select2 + gọi API (giữ nguyên logic của bạn)
         $('#details-table').on('select2:select', async function (e) {
-            const target = e.target; // Lấy phần tử được chọn
-            const row = target.closest('tr'); // Lấy hàng chứa phần tử
-
-            if (!row) return; // Kiểm tra hàng tồn tại
+            const target = e.target;
+            const row = target.closest('tr');
+            if (!row) return;
 
             if (target.name.includes('.ProduceId')) {
                 const productId = target.value;
-
-                // Gọi API để lấy danh sách UnitProductId
                 if (productId) {
                     try {
                         const response = await fetch(`/api/ImportProductApi/GetUnits/${productId}`);
                         if (response.ok) {
                             const units = await response.json();
                             const unitSelect = row.querySelector('select[name$=".UnitProductId"]');
+                            if (!unitSelect) return;
 
-                            if (!unitSelect) {
-                                console.error('Dropdown UnitProductId not found!');
-                                return;
-                            }
-
-                            // Làm mới các tùy chọn trong UnitProductId
                             unitSelect.innerHTML = '<option value="">Select Unit</option>';
                             units.forEach(unit => {
                                 const option = document.createElement('option');
-                                option.value = unit.value || ''; // Kiểm tra giá trị hợp lệ
-                                option.textContent = unit.text || ''; // Kiểm tra text hợp lệ
+                                option.value = unit.value || '';
+                                option.textContent = unit.text || '';
                                 unitSelect.appendChild(option);
                             });
-
-                            // Làm mới Select2 cho dropdown mới
                             $(unitSelect).select2();
-                        } else {
-                            console.error('Failed to fetch units:', response.status);
                         }
                     } catch (error) {
-                        console.error('Error fetching units:', error);
+                        console.error(error);
                     }
                 }
             } else if (target.name.includes('.UnitProductId')) {
                 const unitId = target.value;
-
-                // Gọi API để lấy ConvertRate và Quantity
                 if (unitId) {
                     try {
                         const response = await fetch(`/api/ImportProductApi/GetUnitDetails/${unitId}`);
                         if (response.ok) {
                             const details = await response.json();
-
-                            // Gán dữ liệu vào các trường ConvertRate và Quantity
                             row.querySelector('input[name$=".ConvertRate"]').value = details.rate || '';
                             row.querySelector('input[name$=".Quantity"]').value = 1;
-
-                            // Gọi lại hàm updateAmounts nếu cần
-                            if (typeof updateAmounts === 'function') {
-                                updateAmounts();
-                            }
-                        } else {
-                            console.error('Failed to fetch unit details:', response.status);
+                            updateAmounts();
                         }
                     } catch (error) {
-                        console.error('Error fetching unit details:', error);
+                        console.error(error);
                     }
                 }
             }
         });
 
-        // Khởi tạo Select2 cho tất cả các dropdown trong bảng khi trang load
         $(document).ready(function () {
-            $('#details-table select').select2();
+            $('#details-table select').select2({ width: 'resolve' });
         });
-
-        $(document).ready(function () {
-            $('#details-table select').select2({
-                width: 'resolve' // Đảm bảo tuân thủ width của parent
-            });
-        });
-
-
     </script>
-
 }
-
-

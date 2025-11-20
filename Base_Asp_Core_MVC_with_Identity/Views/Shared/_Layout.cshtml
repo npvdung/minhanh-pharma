@@ -488,37 +488,42 @@
                 <!-- Dashboard -->
                 <li class="nav-item">
                     <a class="nav-link" data-path="/Home" asp-area="" asp-controller="Home" asp-action="Index">
-                        <i class="fas fa-home"></i> Dashboard
+                        <i class="fas fa-signal"></i> Dashboard
                     </a>
                 </li>
                 <!-- Sản phẩm -->
                 <li class="nav-item has-dropdown">
                     <a href="#" class="nav-link dropdown-toggle">
-                        <i class="fa fa-box"></i>QL Danh mục
+                        <i class="fa fa-list"></i>QL Danh mục
                     </a>
                     <ul class="dropdown-menu">
                         <li>
                             <a class="nav-link" data-path="/Category/Index" asp-area="" asp-controller="Category" asp-action="Index">
-                                <i class="fas fa-th"></i> Loại hàng
+                                <i class="fas fa-medkit"></i> Loại thuốc
                             </a>
                         </li>
                         <li>
                             <a class="nav-link" data-path="/Supplier/Index" asp-area="" asp-controller="Supplier" asp-action="Index">
-                                <i class="fas fa-th"></i> Nhà cung cấp
+                                <i class="fas fa-male"></i> Nhà cung cấp
                             </a>
                         </li>
                         <li>
                             <a class="nav-link" data-path="/Product/Index" asp-area="" asp-controller="Product" asp-action="Index">
-                                <i class="fas fa-box"></i>Sản phẩm
+                                <i class="fas fa-box"></i>Sản phẩm thuốc
                             </a>
                         </li>
                     </ul>
                 </li>
                 <li class="nav-item has-dropdown">
                     <a href="#" class="nav-link dropdown-toggle">
-                        <i class="fa fa-info"></i>QL bán hàng
+                        <i class="fa fa-shopping-cart"></i>QL bán hàng
                     </a>
                     <ul class="dropdown-menu">
+                        <li>
+                            <a class="nav-link" data-path="/Customer/Index" asp-area="" asp-controller="Customer" asp-action="Index">
+                                <i class="fas fa-wheelchair"></i>Khách hàng
+                            </a>
+                        </li>
                         <li>
                             <a class="nav-link" data-path="/Invoice/Index" asp-area="" asp-controller="Invoice" asp-action="Index">
                                 <i class="fas fa-file-invoice"></i> Hóa đơn bán
@@ -529,11 +534,7 @@
                                 <i class="fas fa-undo"></i>Hàng bán trả lại
                             </a>
                         </li>
-                        <li>
-                            <a class="nav-link" data-path="/Customer/Index" asp-area="" asp-controller="Customer" asp-action="Index">
-                                <i class="fas fa-th"></i>Khách hàng
-                            </a>
-                        </li>
+                        
                     </ul>
                 </li>
                 <!-- Quản lý -->
@@ -543,22 +544,22 @@
 
                 <li class="nav-item has-dropdown">
                     <a href="#" class="nav-link dropdown-toggle">
-                        <i class="fa fa-info"></i>QL tồn kho
+                        <i class="fa fa-home"></i>QL tồn kho
                     </a>
                     <ul class="dropdown-menu">
                         <li class="nav-item">
                             <a class="nav-link" data-path="/Stock/Index" asp-area="" asp-controller="Stock" asp-action="Index">
-                                <i class="fas fa-home"></i> QL số lượng hàng
+                                <i class="fas fa-archive"></i> QL số lượng hàng
                             </a>
                         </li>
                         <li>
                             <a class="nav-link" data-path="/ReturnProduct/Index" asp-area="" asp-controller="ReturnProduct" asp-action="Index">
-                                <i class="fas fa-undo"></i> Xuất kho
+                                <i class="fas fa-upload"></i> Xuất kho
                             </a>
                         </li>
                         <li>
                             <a class="nav-link" data-path="/ImportProduct/Index" asp-area="" asp-controller="ImportProduct" asp-action="Index">
-                                <i class="fas fa-file-invoice"></i>Nhập kho
+                                <i class="fas fa-cart-arrow-down"></i>Nhập kho
                             </a>
                         </li>
 
@@ -600,7 +601,7 @@
         <div class="main-content">
             <header class="main-header">
                 <div class="header-left">
-                    <h1>Dashboard</h1>
+                    <h1></h1>
                 </div>
                 <div class="header-right">
                     @*<div class="search-bar">

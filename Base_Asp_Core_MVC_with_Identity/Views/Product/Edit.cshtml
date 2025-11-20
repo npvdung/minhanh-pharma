@@ -1,5 +1,13 @@
-﻿@using Base_Asp_Core_MVC_with_Identity.Models.View;
+﻿
+@using Base_Asp_Core_MVC_with_Identity.Models.View
+@using Microsoft.AspNetCore.Mvc.Rendering
 @model ProductViewModel
+
+@{
+    var categoryList = ViewData["CategoryList"] as IEnumerable<SelectListItem> ?? Enumerable.Empty<SelectListItem>();
+    var supplierList = ViewData["SupplierList"] as IEnumerable<SelectListItem> ?? Enumerable.Empty<SelectListItem>();
+}
+
 <style>
     .form-wrapper {
         display: flex;
@@ -172,6 +180,22 @@
             transform: scale(1.05);
         }
 
+    .btn-cancel {
+        background-color: transparent;
+        color: #ff7a00;
+        border: 1px solid #ff7a00;
+        padding: 0.6rem 1.2rem;
+        font-size: 1rem;
+        border-radius: 6px;
+        font-weight: 500;
+        transition: background-color 0.3s ease, color 0.3s ease;
+    }
+
+        .btn-cancel:hover {
+            background-color: #ff7a00;
+            color: white;
+        }
+
     /* Remove Row Button */
     .btn-remove-row {
         background-color: #dc3545;
@@ -210,15 +234,19 @@
                 </div>
                 <div class="form-group col-md-6">
                     @Html.LabelFor(model => model.productMaster.CategoryId, htmlAttributes: new { @class = "control-label col-md-4" })
-                    @Html.DropDownListFor(model => model.productMaster.CategoryId, new SelectList(ViewBag.category_lst, "Text", "Value"),
-                    "Chọn danh mục",
-                    htmlAttributes: new {@id = "category", @class ="form-control col-md-4" })
+                    @Html.DropDownListFor(
+                        model => model.productMaster.CategoryId,
+                        categoryList,
+                        "Chọn danh mục",
+                        htmlAttributes: new { @id = "category", @class = "form-control col-md-4" })
                 </div>
                 <div class="form-group col-md-6">
                     @Html.LabelFor(model => model.productMaster.SupplierId, htmlAttributes: new { @class = "control-label col-md-4" })
-                    @Html.DropDownListFor(model => model.productMaster.SupplierId, new SelectList(ViewBag.supplier_lst, "Text", "Value"),
-                    "Chọn nhà cung cấp",
-                    htmlAttributes: new {@id = "supplier", @class ="form-control col-md-4" })
+                    @Html.DropDownListFor(
+                        model => model.productMaster.SupplierId,
+                        supplierList,
+                        "Chọn nhà cung cấp",
+                        htmlAttributes: new { @id = "supplier", @class = "form-control col-md-4" })
                 </div>
                 <div class="form-group col-md-6">
                     @Html.LabelFor(model => model.productMaster.Unit, htmlAttributes: new { @class = "control-label col-md-4" })
@@ -281,8 +309,6 @@
                             </td>
                         </tr>
                     }
-
-                    <!-- JS sẽ thêm các dòng tại đây -->
                 </tbody>
             </table>
 
@@ -291,12 +317,9 @@
                 <a asp-controller="Product" asp-action="Index" class="btn-cancel"> Back</a>
             </div>
         </form>
-
     </div>
 </div>
 
 @section Scripts{
-    @{
-        <partial name="_ValidationScriptsPartial" />
-    }
-    }
+    <partial name="_ValidationScriptsPartial" />
+}

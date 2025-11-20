@@ -5,24 +5,25 @@
         [Key]
         public Guid ID { get; set; }
 
-        //[Display(Name = "Mã khách hàng")]
+        [Display(Name = "Mã khách hàng")]
         //[Required(ErrorMessage = "Mã khách hàng là bắt buộc.")]
         public string CustomerCode { get; set; }
 
-        //[Display(Name = "Tên khách hàng")]
+        [Display(Name = "Tên khách hàng")]
         //[Required(ErrorMessage = "Tên khách hàng là bắt buộc.")]
         public string FullName { get; set; }
+        [Display(Name = "Ngày sinh")]
         public DateTime? DateOfBirth { get; set; }
-        //[Display(Name = "Số điện thoại")]
+        [Display(Name = "Số điện thoại")]
         //[Required(ErrorMessage = "Số điện thoại khách hàng là bắt buộc.")]
         public string? PhoneNumber { get; set; }
-        //[Display(Name = "Địa chỉ")]
+        [Display(Name = "Địa chỉ")]
         //[Required(ErrorMessage = "Địa chỉ khách hàng là bắt buộc.")]
         public string? Address { get; set; }
-        //[Display(Name = "Email")]
+        [Display(Name = "Email")]
         //[Required(ErrorMessage = "Email khách hàng là bắt buộc.")]
         public string? Email { get; set; }
-        //[Display(Name = "Mô tả")]
+        [Display(Name = "Mô tả")]
         public string? Desciption { get; set; }
     }
 }

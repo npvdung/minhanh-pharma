@@ -14,10 +14,13 @@ namespace Base_Asp_Core_MVC_with_Identity.Controllers
     public class ProductController : Controller
     {
         private readonly Base_Asp_Core_MVC_with_IdentityContext _context;
-        private UserManager<UserSystemIdentity> _userManager;
+        private readonly UserManager<UserSystemIdentity> _userManager;
         private readonly ICommonService _commonService;
 
-        public ProductController(Base_Asp_Core_MVC_with_IdentityContext context, UserManager<UserSystemIdentity> userManager, ICommonService commonService)
+        public ProductController(
+            Base_Asp_Core_MVC_with_IdentityContext context,
+            UserManager<UserSystemIdentity> userManager,
+            ICommonService commonService)
         {
             _context = context;
             _userManager = userManager;
@@ -28,6 +31,32 @@ namespace Base_Asp_Core_MVC_with_Identity.Controllers
         {
             return _context;
         }
+
+        // ----------------- HÀM DÙNG LẠI ĐỂ ĐỔ DROPDOWN -----------------
+        private void PopulateDropDowns()
+        {
+            // Danh mục (Category)
+            var categoryList = _context.Categories
+                .Select(c => new SelectListItem
+                {
+                    Value = c.ID.ToString(),       // Value: ID
+                    Text = c.CategoryName          // Text hiển thị: tên danh mục
+                })
+                .ToList();
+            ViewData["CategoryList"] = categoryList;
+
+            // Nhà cung cấp (Supplier)
+            var supplierList = _context.suppliers
+                .Select(s => new SelectListItem
+                {
+                    Value = s.ID.ToString(),       // Value: ID
+                    Text = s.SupplierName          // Text hiển thị: tên NCC
+                })
+                .ToList();
+            ViewData["SupplierList"] = supplierList;
+        }
+        //----------------------------------------------------------------
+
         [Authorize(Roles = "Admin, Employee")]
         public IActionResult Index()
         {
@@ -38,36 +67,18 @@ namespace Base_Asp_Core_MVC_with_Identity.Controllers
         [Authorize(Roles = "Admin, Employee")]
         public IActionResult Create()
         {
-            Product product = new Product();
             string prefix = "SP_";
             Expression<Func<Product, string>> codeSelector = c => c.ProductCode;
             string autoCode = _commonService.GenerateCategoryCode(prefix, codeSelector);
-            ProductViewModel productViewModel = new ProductViewModel();
 
+            var productViewModel = new ProductViewModel();
+            // đảm bảo productMaster khác null (thường được khởi tạo trong ctor của ViewModel)
             productViewModel.productMaster.ProductCode = autoCode;
             productViewModel.productMaster.Note = "Note";
 
-            List<Category> categoryLst = _context.Categories.ToList();
-            List<SelectListItem> category = new List<SelectListItem>();
-            foreach (var item in categoryLst)
-            {
-                if (item.ID.ToString() != null)
-                {
-                    category.Add(new SelectListItem { Text = item.ID.ToString(), Value = item.CategoryName.ToString() });
-                }
-            }
-            ViewBag.category_lst = category;
+            // chuẩn bị dropdown
+            PopulateDropDowns();
 
-            List<Supplier> supplierLst = _context.suppliers.ToList();
-            List<SelectListItem> supplier = new List<SelectListItem>();
-            foreach (var item in supplierLst)
-            {
-                if (item.ID.ToString() != null)
-                {
-                    supplier.Add(new SelectListItem { Text = item.ID.ToString(), Value = item.SupplierName.ToString() });
-                }
-            }
-            ViewBag.supplier_lst = supplier;
             return View(productViewModel);
         }
 
@@ -76,10 +87,14 @@ namespace Base_Asp_Core_MVC_with_Identity.Controllers
         [Authorize(Roles = "Admin, Employee")]
         public IActionResult Create(ProductViewModel empobj)
         {
-            //if (ModelState.IsValid)
-            //{
-            ProductViewModel productViewModel = new ProductViewModel();
-            Product product = new Product()
+            if (!ModelState.IsValid)
+            {
+                // nếu lỗi validate thì đổ lại dropdown
+                PopulateDropDowns();
+                return View(empobj);
+            }
+
+            var product = new Product
             {
                 ID = Guid.NewGuid(),
                 ProductCode = empobj.productMaster.ProductCode,
@@ -91,64 +106,71 @@ namespace Base_Asp_Core_MVC_with_Identity.Controllers
                 Ingredient = empobj.productMaster.Ingredient,
                 Content = empobj.productMaster.Content,
                 Uses = empobj.productMaster.Uses,
-                UserManual= empobj.productMaster.UserManual,
+                UserManual = empobj.productMaster.UserManual,
                 Note = empobj.productMaster.Note,
             };
             _context.Products.Add(product);
             _context.SaveChanges();
 
-            foreach (var item in empobj.productUnits)
+            if (empobj.productUnits != null)
             {
-                ProductUnit productUnit = new ProductUnit()
+                foreach (var item in empobj.productUnits)
                 {
-                    ID = Guid.NewGuid(),
-                    ProductId = product.ID.ToString(),
-                    UnitName = item.UnitName,
-                    Rate = item.Rate,
-                    PriceBuy = item.PriceBuy,
-                    Contain = "BackUp",
-                    PriceSell = item.PriceSell
-                };
-                _context.productUnits.Add(productUnit);
+                    var productUnit = new ProductUnit
+                    {
+                        ID = Guid.NewGuid(),
+                        ProductId = product.ID.ToString(),
+                        UnitName = item.UnitName,
+                        Rate = item.Rate,
+                        PriceBuy = item.PriceBuy,
+                        Contain = "BackUp",
+                        PriceSell = item.PriceSell
+                    };
+                    _context.productUnits.Add(productUnit);
+                }
                 _context.SaveChanges();
-
             }
+
             TempData["ResultOk"] = "Tạo dữ liệu thành công !";
             return RedirectToAction("Index");
-            //}
-            return View(empobj);
         }
 
         [Authorize(Roles = "Admin, Employee")]
         public IActionResult Edit(Guid Id)
         {
-            if (Id == null)
+            var empfromdb = _context.Products.Find(Id);
+            if (empfromdb == null)
             {
                 return NotFound();
             }
-            var empfromdb = _context.Products.Find(Id);
-            var empfromdbDetail = _context.productUnits.Where(x =>x.ProductId == Id.ToString());
-            ProductViewModel productViewModel = new ProductViewModel();
 
-            productViewModel.productMaster = new Product()
+            var empfromdbDetail = _context.productUnits
+                .Where(x => x.ProductId == Id.ToString())
+                .ToList();
+
+            var productViewModel = new ProductViewModel
             {
-                ID = Id,
-                ProductCode = empfromdb.ProductCode,
-                ProductName = empfromdb.ProductName,
-                CategoryId = empfromdb.CategoryId,
-                SupplierId = empfromdb.SupplierId,
-                Unit = empfromdb.Unit,
-                Price = empfromdb.Price,
-                Ingredient = empfromdb.Ingredient,
-                Content = empfromdb.Content,
-                Uses = empfromdb.Uses,
-                UserManual = empfromdb.UserManual,
-                Note = empfromdb.Note
+                productMaster = new Product
+                {
+                    ID = Id,
+                    ProductCode = empfromdb.ProductCode,
+                    ProductName = empfromdb.ProductName,
+                    CategoryId = empfromdb.CategoryId,
+                    SupplierId = empfromdb.SupplierId,
+                    Unit = empfromdb.Unit,
+                    Price = empfromdb.Price,
+                    Ingredient = empfromdb.Ingredient,
+                    Content = empfromdb.Content,
+                    Uses = empfromdb.Uses,
+                    UserManual = empfromdb.UserManual,
+                    Note = empfromdb.Note
+                },
+                productUnits = new List<ProductUnit>()
             };
 
             foreach (var item in empfromdbDetail)
             {
-                productViewModel.productUnits.Add( new ProductUnit()
+                productViewModel.productUnits.Add(new ProductUnit
                 {
                     ID = item.ID,
                     ProductId = item.ProductId,
@@ -160,31 +182,9 @@ namespace Base_Asp_Core_MVC_with_Identity.Controllers
                 });
             }
 
-            List<Category> categoryLst = _context.Categories.ToList();
-            List<SelectListItem> category = new List<SelectListItem>();
-            foreach (var item in categoryLst)
-            {
-                if (item.ID.ToString() != null)
-                {
-                    category.Add(new SelectListItem { Text = item.ID.ToString(), Value = item.CategoryName.ToString() });
-                }
-            }
-            ViewBag.category_lst = category;
+            // chuẩn bị dropdown
+            PopulateDropDowns();
 
-            List<Supplier> supplierLst = _context.suppliers.ToList();
-            List<SelectListItem> supplier = new List<SelectListItem>();
-            foreach (var item in supplierLst)
-            {
-                if (item.ID.ToString() != null)
-                {
-                    supplier.Add(new SelectListItem { Text = item.ID.ToString(), Value = item.SupplierName.ToString() });
-                }
-            }
-            ViewBag.supplier_lst = supplier;
-            if (empfromdb == null)
-            {
-                return NotFound();
-            }
             return View(productViewModel);
         }
 
@@ -193,11 +193,17 @@ namespace Base_Asp_Core_MVC_with_Identity.Controllers
         [Authorize(Roles = "Admin, Employee")]
         public IActionResult Edit(ProductViewModel empobj)
         {
+            if (!ModelState.IsValid)
+            {
+                PopulateDropDowns();
+                return View(empobj);
+            }
+
             var empfromdb = _context.Products.Find(empobj.productMaster.ID);
-            var empfromdbDetail = _context.productUnits.Where(x => x.ProductId == empfromdb.ID.ToString());
-            ProductViewModel productViewModel = new ProductViewModel();
-
-
+            if (empfromdb == null)
+            {
+                return NotFound();
+            }
 
             empfromdb.ProductCode = empobj.productMaster.ProductCode;
             empfromdb.ProductName = empobj.productMaster.ProductName;
@@ -213,22 +219,18 @@ namespace Base_Asp_Core_MVC_with_Identity.Controllers
             _context.Products.Update(empfromdb);
             _context.SaveChanges();
 
-
-            foreach (var item in empobj.productUnits)
+            if (empobj.productUnits != null)
             {
-
-                item.ProductId = empfromdb.ID.ToString();
-                item.UnitName = item.UnitName;
-                item.Rate = item.Rate;
-                item.PriceBuy = item.PriceBuy;
-                item.Contain = item.Contain;
-                item.PriceSell = item.PriceSell;
-                _context.productUnits.Update(item);
+                foreach (var item in empobj.productUnits)
+                {
+                    item.ProductId = empfromdb.ID.ToString();
+                    _context.productUnits.Update(item);
+                }
                 _context.SaveChanges();
             }
 
             TempData["ResultOk"] = "Cập nhập dữ liệu thành công !";
-                return RedirectToAction("Index");
+            return RedirectToAction("Index");
         }
     }
 }
