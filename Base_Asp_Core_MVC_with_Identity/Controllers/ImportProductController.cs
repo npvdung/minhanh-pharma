@@ -37,7 +37,6 @@ namespace Base_Asp_Core_MVC_with_Identity.Controllers
         // ----------------- HÀM DÙNG LẠI ĐỂ ĐỔ DROPDOWN -----------------
         private void PopulateDropDowns()
         {
-            // Product + Supplier
             var productList = (from p in _context.Products
                                join s in _context.suppliers on p.SupplierId equals s.ID.ToString()
                                select new SelectListItem
@@ -47,7 +46,6 @@ namespace Base_Asp_Core_MVC_with_Identity.Controllers
                                }).ToList();
             ViewData["ProductList"] = productList;
 
-            // Unit
             var unitList = _context.productUnits
                 .Select(u => new SelectListItem
                 {
@@ -57,7 +55,6 @@ namespace Base_Asp_Core_MVC_with_Identity.Controllers
                 .ToList();
             ViewData["UnitList"] = unitList;
 
-            // Account/User
             var accountList = _userManager.Users
                 .Select(p => new SelectListItem
                 {
@@ -67,7 +64,6 @@ namespace Base_Asp_Core_MVC_with_Identity.Controllers
                 .ToList();
             ViewData["AccountList"] = accountList;
 
-            // Status
             var statusList = Enum.GetValues(typeof(EnumApprodImport))
                 .Cast<EnumApprodImport>()
                 .Select(e => new SelectListItem
@@ -99,9 +95,10 @@ namespace Base_Asp_Core_MVC_with_Identity.Controllers
             viewModel.ImportMaster.Description = "Không";
             viewModel.ImportMaster.ImportDate = DateTime.Now;
 
-            // chuẩn bị dropdown
-            PopulateDropDowns();
+            // Mặc định trạng thái là ĐANG CHỜ – user không tự chọn nữa
+            viewModel.ImportMaster.Status = (int)EnumApprodImport.Wait;
 
+            PopulateDropDowns();
             return View(viewModel);
         }
 
@@ -116,9 +113,13 @@ namespace Base_Asp_Core_MVC_with_Identity.Controllers
                 return View(empobj);
             }
 
-            // tạm fix SupplierId (bạn có thể thay bằng dropdown sau)
+            // tạm fix SupplierId
             empobj.ImportMaster.SupplierId = "08dc620d-b70b-4bec-8957-92617c38b23b";
 
+            // luôn set trạng thái Waiting khi tạo mới
+            empobj.ImportMaster.Status = (int)EnumApprodImport.Wait;
+
+            // ----- MASTER -----
             var master = new Import
             {
                 ImportCode = empobj.ImportMaster.ImportCode,
@@ -138,70 +139,60 @@ namespace Base_Asp_Core_MVC_with_Identity.Controllers
             {
                 foreach (var item in empobj.ProductDetails)
                 {
-                    if (item.ProduceId != null)
+                    if (string.IsNullOrEmpty(item.ProduceId))
+                        continue;
+
+                    var product = _context.Products
+                        .FirstOrDefault(p => p.ID.ToString() == item.ProduceId);
+
+                    var manufacturingDate = item.ManufacturingDate ?? DateTime.Now.Date;
+                    var importDate = master.ImportDate ?? DateTime.Now;
+
+                    var existingCount = _context.stocks.Count(w =>
+                        w.ProductId == item.ProduceId &&
+                        w.ManufacturingDate.HasValue &&
+                        w.ManufacturingDate.Value.Date == manufacturingDate.Date &&
+                        w.ProductionBatch.HasValue &&
+                        w.ProductionBatch.Value.Date == importDate.Date);
+
+                    var index = existingCount + 1;
+
+                    var batchCode = BatchCodeHelper.GenerateBatchCode(
+                        product?.ProductName ?? "unknown",
+                        manufacturingDate,
+                        importDate,
+                        index
+                    );
+
+                    var detailEntity = new ImportProducts
                     {
-                        details.Add(new ImportProducts
-                        {
-                            ImportProductId = master.ID.ToString(),
-                            Description = "Không",
-                            ProductionBatch = DateTime.Now,
-                            ManufacturingDate = item.ManufacturingDate,
-                            ExpirationData = item.ExpirationData,
-                            Unit = item.Unit,
-                            Quantity = item.Quantity,
-                            Price = item.Price,
-                            ProduceId = item.ProduceId,
-                            ConvertRate = item.ConvertRate,
-                            ImportPrice = item.ImportPrice,
-                            TotalAmount = item.TotalAmount,
-                            UnitProductId = item.UnitProductId,
-                        });
-                    }
+                        ImportProductId = master.ID.ToString(),
+                        Description = item.Description ?? "Không",
+                        ProductionBatch = importDate,
+                        ManufacturingDate = item.ManufacturingDate,
+                        ExpirationData = item.ExpirationData,
+                        Unit = item.Unit,
+                        Quantity = item.Quantity,
+                        Price = item.Price,
+                        ProduceId = item.ProduceId,
+                        ConvertRate = item.ConvertRate,
+                        ImportPrice = item.ImportPrice,
+                        TotalAmount = item.TotalAmount,
+                        UnitProductId = item.UnitProductId,
+                        BatchCode = batchCode
+                    };
+
+                    details.Add(detailEntity);
                 }
             }
 
             _context.ImportProductDetails.AddRange(details);
             _context.SaveChanges();
 
-            // Cập nhật kho nếu được duyệt
-            if (empobj.ImportMaster.Status == (int)EnumApprodImport.approved)
-            {
-                List<Warehouse> allStock = _context.stocks.ToList();
-                var existStock = allStock.FindAll(x =>
-                    details.Select(y => y.ProduceId).Contains(x.ProductId.ToString()) &&
-                    details.Select(z => z.ExpirationData).Contains(x.ExpirationData));
+            // LÚC CREATE KHÔNG CẬP NHẬT TỒN KHO NỮA
+            // chỉ cập nhật khi ấn nút Phê duyệt
 
-                foreach (var item in existStock)
-                {
-                    var itemE = _context.stocks.Find(item.ID);
-                    var countItem = details
-                        .Where(x => x.ProduceId == item.ProductId && x.ExpirationData.Value.Date == item.ExpirationData.Value)
-                        .FirstOrDefault();
-
-                    var insertItem = countItem.Quantity * (int)countItem.ConvertRate;
-                    itemE.QuantityInStock += insertItem;
-                    _context.stocks.Update(itemE);
-
-                    details.RemoveAll(x => x.ID == countItem.ID);
-                }
-
-                foreach (var item in details)
-                {
-                    var itemStock = new Warehouse
-                    {
-                        ProductId = item.ProduceId,
-                        ExpirationData = item.ExpirationData,
-                        ManufacturingDate = item.ManufacturingDate,
-                        ProductionBatch = DateTime.Now,
-                        TotalValueImport = item.Price,
-                        QuantityInStock = item.Quantity * (int)item.ConvertRate,
-                    };
-                    _context.stocks.Add(itemStock);
-                }
-                _context.SaveChanges();
-            }
-
-            TempData["ResultOk"] = "Tạo dữ liệu thành công !";
+            TempData["ResultOk"] = "Tạo dữ liệu thành công (đang chờ phê duyệt)!";
             return RedirectToAction("Index");
         }
 
@@ -253,12 +244,11 @@ namespace Base_Asp_Core_MVC_with_Identity.Controllers
                     ImportPrice = item.ImportPrice,
                     TotalAmount = item.TotalAmount,
                     UnitProductId = item.UnitProductId,
+                    BatchCode = item.BatchCode
                 });
             }
 
-            // chuẩn bị dropdown
             PopulateDropDowns();
-
             return View(viewModel);
         }
 
@@ -273,6 +263,13 @@ namespace Base_Asp_Core_MVC_with_Identity.Controllers
                 return View(empobj);
             }
 
+            // LẤY LẠI STATUS GỐC TỪ DB – KHÔNG CHO EDIT THAY ĐỔI
+            var oldMaster = _context.ImportsProduct
+                .AsNoTracking()
+                .FirstOrDefault(x => x.ID == empobj.ImportMaster.ID);
+
+            var status = oldMaster?.Status ?? empobj.ImportMaster.Status;
+
             var master = new Import
             {
                 ID = empobj.ImportMaster.ID,
@@ -283,7 +280,7 @@ namespace Base_Asp_Core_MVC_with_Identity.Controllers
                 Description = empobj.ImportMaster.Description,
                 TotalAmount = empobj.ImportMaster.TotalAmount,
                 AccountId = empobj.ImportMaster.AccountId,
-                Status = empobj.ImportMaster.Status
+                Status = status   // giữ nguyên trạng thái
             };
             _context.ImportsProduct.Update(master);
             _context.SaveChanges();
@@ -300,8 +297,8 @@ namespace Base_Asp_Core_MVC_with_Identity.Controllers
                         {
                             ID = item.ID,
                             ImportProductId = master.ID.ToString(),
-                            Description = "Không",
-                            ProductionBatch = DateTime.Now,
+                            Description = item.Description ?? "Không",
+                            ProductionBatch = item.ProductionBatch,
                             ManufacturingDate = item.ManufacturingDate,
                             ExpirationData = item.ExpirationData,
                             Unit = item.Unit,
@@ -312,6 +309,7 @@ namespace Base_Asp_Core_MVC_with_Identity.Controllers
                             ImportPrice = item.ImportPrice,
                             TotalAmount = item.TotalAmount,
                             UnitProductId = item.UnitProductId,
+                            BatchCode = item.BatchCode
                         });
                     }
                 }
@@ -320,44 +318,84 @@ namespace Base_Asp_Core_MVC_with_Identity.Controllers
             _context.ImportProductDetails.UpdateRange(details);
             _context.SaveChanges();
 
-            if (empobj.ImportMaster.Status == (int)EnumApprodImport.approved)
-            {
-                List<Warehouse> allStock = _context.stocks.ToList();
-                var existStock = allStock.FindAll(x =>
-                    details.Select(y => y.ProduceId).Contains(x.ProductId.ToString()) &&
-                    details.Select(z => z.ExpirationData).Contains(x.ExpirationData));
-
-                foreach (var item in existStock)
-                {
-                    var itemE = _context.stocks.Find(item.ID);
-                    var countItem = details
-                        .Where(x => x.ProduceId == item.ProductId && x.ExpirationData.Value.Date == item.ExpirationData.Value)
-                        .FirstOrDefault();
-
-                    var insertItem = countItem.Quantity * (int)countItem.ConvertRate;
-                    itemE.QuantityInStock += insertItem;
-                    _context.stocks.Update(itemE);
-                    details.RemoveAll(x => x.ID == countItem.ID);
-                }
-
-                foreach (var item in details)
-                {
-                    var itemStock = new Warehouse
-                    {
-                        ProductId = item.ProduceId,
-                        ExpirationData = item.ExpirationData,
-                        ManufacturingDate = item.ManufacturingDate,
-                        ProductionBatch = DateTime.Now,
-                        TotalValueImport = item.Price,
-                        QuantityInStock = item.Quantity * (int)item.ConvertRate,
-                    };
-                    _context.stocks.Add(itemStock);
-                }
-                _context.SaveChanges();
-            }
-
             TempData["ResultOk"] = "Cập nhập dữ liệu thành công !";
             return RedirectToAction("Index");
+        }
+
+        // ======================= PHÊ DUYỆT + CẬP NHẬT TỒN KHO =======================
+        [HttpPost]
+        [Authorize(Roles = "Admin, Employee")]
+        public IActionResult Approve(Guid id)
+        {
+            var import = _context.ImportsProduct.FirstOrDefault(x => x.ID == id);
+            if (import == null)
+            {
+                return Json(new { success = false, message = "Không tìm thấy phiếu nhập." });
+            }
+
+            if (import.Status == (int)EnumApprodImport.approved)
+            {
+                return Json(new { success = false, message = "Phiếu nhập này đã được phê duyệt trước đó." });
+            }
+
+            var details = _context.ImportProductDetails
+                .Where(d => d.ImportProductId == import.ID.ToString())
+                .ToList();
+
+            if (!details.Any())
+            {
+                return Json(new { success = false, message = "Phiếu nhập không có chi tiết để cập nhật kho." });
+            }
+
+            var importDate = import.ImportDate ?? DateTime.Now;
+
+            foreach (var item in details)
+            {
+                var baseQty = (item.Quantity ?? 0) * (int)(item.ConvertRate ?? 1);
+
+                var existingStock = _context.stocks.FirstOrDefault(w =>
+                    w.ProductId == item.ProduceId &&
+                    w.BatchCode == item.BatchCode);
+
+                if (existingStock != null)
+                {
+                    existingStock.QuantityInStock =
+                        (existingStock.QuantityInStock ?? 0) + baseQty;
+
+                    existingStock.ExpirationData = item.ExpirationData;
+                    existingStock.ManufacturingDate = item.ManufacturingDate;
+                    existingStock.ProductionBatch = item.ProductionBatch ?? importDate;
+                    existingStock.TotalValueImport = item.Price;
+
+                    _context.stocks.Update(existingStock);
+                }
+                else
+                {
+                    var stock = new Warehouse
+                    {
+                        ProductId = item.ProduceId,
+                        BatchCode = item.BatchCode,
+                        ExpirationData = item.ExpirationData,
+                        ManufacturingDate = item.ManufacturingDate,
+                        ProductionBatch = item.ProductionBatch ?? importDate,
+                        TotalValueImport = item.Price,
+                        QuantityInStock = baseQty
+                    };
+                    _context.stocks.Add(stock);
+                }
+            }
+
+            // cập nhật trạng thái -> approved
+            import.Status = (int)EnumApprodImport.approved;
+            _context.ImportsProduct.Update(import);
+
+            _context.SaveChanges();
+
+            return Json(new
+            {
+                success = true,
+                message = "Đã phê duyệt phiếu nhập và cập nhật tồn kho theo lô."
+            });
         }
     }
 }

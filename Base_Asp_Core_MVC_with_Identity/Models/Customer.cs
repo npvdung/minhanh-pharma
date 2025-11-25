@@ -23,7 +23,7 @@
         [Display(Name = "Email")]
         //[Required(ErrorMessage = "Email khách hàng là bắt buộc.")]
         public string? Email { get; set; }
-        [Display(Name = "Mô tả")]
+        [Display(Name = "Triệu chứng")]
         public string? Desciption { get; set; }
     }
 }

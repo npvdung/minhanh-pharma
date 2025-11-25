@@ -114,7 +114,7 @@
         background-color: #f8f9fa;
         font-weight: bold;
     }
-    /* Styles for the table */
+
     #details-table {
         width: 100%;
         border-collapse: collapse;
@@ -132,7 +132,7 @@
         }
 
         #details-table th, #details-table td {
-            padding: 12px 15px;
+            padding: 8px 10px;
             text-align: center;
             border-bottom: 1px solid #ddd;
         }
@@ -151,13 +151,12 @@
         #details-table td input[type="date"],
         #details-table td select {
             width: 100%;
-            padding: 8px;
+            padding: 6px;
             border: 1px solid #ccc;
             border-radius: 4px;
-            font-size: 14px;
+            font-size: 13px;
         }
 
-    /* Styles for buttons */
     button {
         padding: 10px 15px;
         font-size: 14px;
@@ -168,7 +167,6 @@
         transition: background-color 0.3s ease, transform 0.2s ease;
     }
 
-    /* Add Row Button */
     .btn-add-row {
         background-color: #FC8F54;
         color: white;
@@ -181,7 +179,6 @@
             transform: scale(1.05);
         }
 
-    /* Remove Row Button */
     .btn-remove-row {
         background-color: #dc3545;
         color: white;
@@ -199,21 +196,21 @@
         text-align: left;
     }
 
-    /*.select2-container .select2-selection--single {
-        height: 38px;
-        line-height: 38px;
+    span.select2-selection.select2-selection--single {
+        height: 36px;
     }
-
-    .select2-container .select2-selection__rendered {
-        padding-left: 10px;
-    }*/
-
 </style>
 
 <div class="form-wrapper">
     <div class="form-container">
         <h2 class="form-title">Thêm hàng vào kho</h2>
-        <form method="post" id="import-form">
+        <form asp-action="Create"
+              asp-controller="ImportProduct"
+              method="post"
+              asp-antiforgery="true"
+              id="import-form">
+
+            <!-- MASTER -->
             <div class="row">
                 <div class="form-group col-md-6">
                     @Html.LabelFor(model => model.ImportMaster.ImportCode, htmlAttributes: new { @class = "control-label" })
@@ -227,7 +224,7 @@
                 </div>
                 <div class="form-group col-md-6">
                     @Html.LabelFor(model => model.ImportMaster.ImportDate, htmlAttributes: new { @class = "control-label" })
-                    <input type="text" class="form-control" asp-for="ImportMaster.ImportDate">
+                    <input type="date" class="form-control" asp-for="ImportMaster.ImportDate">
                     <span asp-validation-for="ImportMaster.ImportDate" class="alert-danger"></span>
                 </div>
                 <div class="form-group col-md-6">
@@ -255,12 +252,12 @@
                         model => model.ImportMaster.Status,
                         statusList,
                         "Chọn trạng thái",
-                        htmlAttributes: new { @id = "supplier", @class = "form-control col-md-4" })
+                        htmlAttributes: new { @id = "status", @class = "form-control col-md-4" })
                     <span asp-validation-for="ImportMaster.Status" class="alert-danger"></span>
                 </div>
             </div>
 
-            <!-- Hidden Template for Dropdown -->
+            <!-- TEMPLATE DROPDOWN -->
             <select id="product-template" style="display: none;">
                 @foreach (var item in productList)
                 {
@@ -274,24 +271,30 @@
                 }
             </select>
 
+            <!-- DETAILS 2 HÀNG / 1 ITEM -->
             <h3 class="form-title">Chi tiết sản phẩm</h3>
             <table id="details-table">
                 <thead>
                     <tr>
-                        <th style="background-color: #e06f00 !important; width: 300px;">Tên sản phẩm</th>
-                        <th style="background-color: #e06f00 !important; width: 100px;">Ngày sản xuất</th>
-                        <th style="background-color: #e06f00 !important; width: 100px;">Ngày hết hạn</th>
-                        <th style="background-color: #e06f00 !important; width: 120px;">Đơn vị</th>
-                        <th style="background-color: #e06f00 !important; width: 100px;">Tỉ lệ</th>
-                        <th style="background-color: #e06f00 !important; width: 100px;">Số lượng</th>
-                        <th style="background-color: #e06f00 !important; width: 100px;">Giá nhập</th>
-                        <th style="background-color: #e06f00 !important; width: 100px;">Thành tiền</th>
-                        <th style="background-color: #e06f00 !important; width: 70px;"></th>
+                        <th rowspan="2" style="background-color: #e06f00 !important; width: 260px;">Tên sản phẩm</th>
+                        <th style="background-color: #e06f00 !important;">Ngày sản xuất</th>
+                        <th style="background-color: #e06f00 !important;">Ngày hết hạn</th>
+                        <th style="background-color: #e06f00 !important;">Đơn vị</th>
+                        <th style="background-color: #e06f00 !important;">Tỉ lệ</th>
+                        <th rowspan="2" style="background-color: #e06f00 !important; width: 60px;"></th>
+                    </tr>
+                    <tr>
+                        <th style="background-color: #e06f00 !important;">Số lượng</th>
+                        <th style="background-color: #e06f00 !important;">Giá nhập</th>
+                        <th style="background-color: #e06f00 !important;">Thành tiền</th>
+                        <th style="background-color: #e06f00 !important;">Mã lô nhập</th>
                     </tr>
                 </thead>
                 <tbody></tbody>
             </table>
+
             <button type="button" class="btn-add-row">+ Thêm dòng</button>
+            <div asp-validation-summary="All" class="text-danger"></div>
 
             <div class="button-group">
                 <button type="submit" class="btn-submit"><i class="bi bi-save"></i> Tạo mới</button>
@@ -302,82 +305,204 @@
 </div>
 
 @section Scripts {
-    @* Validation *@
     <partial name="_ValidationScriptsPartial" />
+
     <script>
-        $(document).ready(function () {
-            $('.product-select').select2({
-                placeholder: "Select Product",
-                allowClear: true,
-                width: '100%'
-            });
+        // ----------------- Helper: bỏ dấu + sinh slug -----------------
+        function slugify(text) {
+            return text
+                .toString()
+                .toLowerCase()
+                .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+                .replace(/[^a-z0-9]+/g, '-')
+                .replace(/^-+|-+$/g, '');
+        }
 
-            $('.unit-select').select2({
-                placeholder: "Select Unit",
-                allowClear: true,
-                width: '100%'
-            });
-        });
+        // Lấy 2 <tr> của 1 item theo index
+        function getRowPair(index) {
+            const row1 = document.querySelector('#details-table tbody tr.detail-row[data-index="' + index + '"]');
+            const row2 = document.querySelector('#details-table tbody tr.detail-row-2[data-index="' + index + '"]');
+            return { row1, row2 };
+        }
 
+        // ----------------- Sinh BatchCode cho 1 item -----------------
+        function generateBatchCode(index) {
+            const rows = getRowPair(index);
+            if (!rows.row1 || !rows.row2) return;
+
+            const productSelect     = rows.row1.querySelector('select[name$=".ProduceId"]');
+            const manufacturingInput = rows.row1.querySelector('input[name$=".ManufacturingDate"]');
+            const importDateInput    = document.querySelector('input[name="ImportMaster.ImportDate"]');
+            const batchCodeInput     = rows.row2.querySelector('input[name$=".BatchCode"]');
+
+            if (!productSelect || !manufacturingInput || !importDateInput || !batchCodeInput) return;
+
+            const selectedText = productSelect.options[productSelect.selectedIndex]?.text || "";
+            const productName  = (selectedText.split(' - ')[0] || selectedText).trim();
+
+            const mDate = manufacturingInput.value;
+            const iDate = importDateInput.value;
+
+            if (!productName || !mDate || !iDate) {
+                batchCodeInput.value = "";
+                return;
+            }
+
+            const slugName = slugify(productName);
+            const mDateStr = mDate.replace(/-/g, '');
+            const iDateStr = iDate.replace(/-/g, '');
+
+            const code = `${slugName}-${mDateStr}-${iDateStr}-${(index + 1).toString().padStart(2, '0')}`;
+            batchCodeInput.value = code;
+        }
+
+        // ----------------- Tính tiền & tổng tiền master -----------------
         function updateAmounts() {
             let totalAmountMaster = 0;
 
-            document.querySelectorAll('#details-table tbody tr').forEach(row => {
-                const quantity = parseFloat(row.querySelector('input[name$=".Quantity"]').value) || 0;
-                const importPrice = parseFloat(row.querySelector('input[name$=".ImportPrice"]').value) || 0;
+            document.querySelectorAll('#details-table tbody tr.detail-row-2').forEach(row2 => {
+                const qtyInput   = row2.querySelector('input[name$=".Quantity"]');
+                const priceInput = row2.querySelector('input[name$=".ImportPrice"]');
+                const totalInput = row2.querySelector('input[name$=".TotalAmount"]');
 
-                const totalAmount = quantity * importPrice;
-                row.querySelector('input[name$=".TotalAmount"]').value = totalAmount.toFixed(2);
+                const quantity   = parseFloat(qtyInput?.value)   || 0;
+                const importPrice = parseFloat(priceInput?.value) || 0;
 
-                totalAmountMaster += totalAmount;
+                const total = quantity * importPrice;
+                if (totalInput) {
+                    totalInput.value = total.toFixed(2);
+                }
+
+                totalAmountMaster += total;
             });
+
             $('#TotalAmountMaster').val(totalAmountMaster.toFixed(2));
         }
 
-        document.querySelector('#details-table').addEventListener('input', function (e) {
-            if (
-                e.target.matches('input[name$=".Quantity"]') ||
-                e.target.matches('input[name$=".ConvertRate"]') ||
-                e.target.matches('input[name$=".ImportPrice"]')
-            ) {
+        // ----------------- Event trên bảng chi tiết -----------------
+        const detailsTable = document.querySelector('#details-table');
+
+        // input: Quantity, ImportPrice, ManufacturingDate
+        detailsTable.addEventListener('input', function (e) {
+            const tr = e.target.closest('tr');
+            if (!tr) return;
+            const index = tr.dataset.index;
+
+            if (e.target.name.includes('.Quantity') || e.target.name.includes('.ImportPrice')) {
                 updateAmounts();
+            }
+
+            if (e.target.name.includes('.ManufacturingDate')) {
+                generateBatchCode(parseInt(index));
             }
         });
 
+        // change: chọn Product hoặc Unit
+        detailsTable.addEventListener('change', async function (e) {
+            const tr = e.target.closest('tr');
+            if (!tr) return;
+            const index = parseInt(tr.dataset.index);
+            const rows = getRowPair(index);
+
+            // Chọn sản phẩm
+            if (e.target.name.includes('.ProduceId')) {
+                generateBatchCode(index);
+
+                const productId = e.target.value;
+                if (productId) {
+                    const response = await fetch(`/api/ImportProductApi/GetUnits/${productId}`);
+                    if (response.ok) {
+                        const units = await response.json();
+                        const unitSelect = rows.row1.querySelector('select[name$=".UnitProductId"]');
+                        if (!unitSelect) return;
+
+                        unitSelect.innerHTML = '<option value="">Select Unit</option>';
+                        units.forEach(unit => {
+                            const option = document.createElement('option');
+                            option.value = unit.value || '';
+                            option.textContent = unit.text || '';
+                            unitSelect.appendChild(option);
+                        });
+
+                        $(unitSelect).select2({
+                            placeholder: "Select Unit",
+                            allowClear: true,
+                            width: '100%'
+                        });
+                    }
+                }
+            }
+
+            // Chọn đơn vị -> lấy ConvertRate
+            if (e.target.name.includes('.UnitProductId')) {
+                const unitId = e.target.value;
+                if (unitId) {
+                    const response = await fetch(`/api/ImportProductApi/GetUnitDetails/${unitId}`);
+                    if (response.ok) {
+                        const details = await response.json();
+                        rows.row1.querySelector('input[name$=".ConvertRate"]').value = details.rate || '';
+                        const row2 = rows.row2;
+                        row2.querySelector('input[name$=".Quantity"]').value = 1;
+                        updateAmounts();
+                    }
+                }
+            }
+        });
+
+        // Thay đổi ngày nhập -> sinh lại BatchCode cho tất cả dòng
+        document.addEventListener('DOMContentLoaded', function () {
+            const importDateInput = document.querySelector('input[name="ImportMaster.ImportDate"]');
+            if (importDateInput) {
+                importDateInput.addEventListener('change', function () {
+                    document.querySelectorAll('#details-table tbody tr.detail-row').forEach(row1 => {
+                        const index = parseInt(row1.dataset.index);
+                        generateBatchCode(index);
+                    });
+                });
+            }
+        });
+
+        // ----------------- Thêm 2 hàng mới -----------------
         document.querySelector('.btn-add-row').addEventListener('click', function () {
             const tableBody = document.querySelector('#details-table tbody');
-            const rowIndex = tableBody.querySelectorAll('tr').length;
+            const rowIndex = tableBody.querySelectorAll('tr.detail-row').length;
 
-            const newRow = `
-                <tr>
-                    <td>
-                        <select name="ProductDetails[${rowIndex}].ProduceId" class="form-control product-select">
-                            <option value="">Select Product</option>
-                            ${document.getElementById('product-template').innerHTML}
-                        </select>
-                    </td>
-                    <td><input type="date" name="ProductDetails[${rowIndex}].ManufacturingDate" class="form-control" /></td>
-                    <td><input type="date" name="ProductDetails[${rowIndex}].ExpirationData" class="form-control" /></td>
-                    <td>
-                        <select name="ProductDetails[${rowIndex}].UnitProductId" class="form-control unit-select">
-                            <option value="">Select Unit</option>
-                            ${document.getElementById('unit-template').innerHTML}
-                        </select>
-                    </td>
-                    <td><input type="number" name="ProductDetails[${rowIndex}].ConvertRate" class="form-control" /></td>
-                    <td><input type="number" name="ProductDetails[${rowIndex}].Quantity" class="form-control" /></td>
-                    <td><input type="number" name="ProductDetails[${rowIndex}].ImportPrice" class="form-control" /></td>
-                    <td><input type="number" name="ProductDetails[${rowIndex}].TotalAmount" class="form-control" readonly /></td>
-                    <td><button type="button" class="btn-remove-row btn btn-danger">Xóa</button></td>
-                </tr>`;
+            const html = `
+<tr class="detail-row" data-index="${rowIndex}">
+    <td rowspan="2">
+        <select name="ProductDetails[${rowIndex}].ProduceId" class="form-control product-select">
+            <option value="">Select Product</option>
+            ${document.getElementById('product-template').innerHTML}
+        </select>
+    </td>
+    <td><input type="date" name="ProductDetails[${rowIndex}].ManufacturingDate" class="form-control" /></td>
+    <td><input type="date" name="ProductDetails[${rowIndex}].ExpirationData" class="form-control" /></td>
+    <td>
+        <select name="ProductDetails[${rowIndex}].UnitProductId" class="form-control unit-select">
+            <option value="">Select Unit</option>
+            ${document.getElementById('unit-template').innerHTML}
+        </select>
+    </td>
+    <td><input type="number" name="ProductDetails[${rowIndex}].ConvertRate" class="form-control" /></td>
+    <td rowspan="2">
+        <button type="button" class="btn-remove-row btn btn-danger">Xóa</button>
+    </td>
+</tr>
+<tr class="detail-row-2" data-index="${rowIndex}">
+    <td><input type="number" name="ProductDetails[${rowIndex}].Quantity" class="form-control" /></td>
+    <td><input type="number" name="ProductDetails[${rowIndex}].ImportPrice" class="form-control" /></td>
+    <td><input type="number" name="ProductDetails[${rowIndex}].TotalAmount" class="form-control" readonly /></td>
+    <td><input type="text"   name="ProductDetails[${rowIndex}].BatchCode" class="form-control batch-code-input" readonly /></td>
+</tr>`;
 
-            tableBody.insertAdjacentHTML('beforeend', newRow);
+            tableBody.insertAdjacentHTML('beforeend', html);
 
             $('.product-select').select2({
                 placeholder: "Select Product",
                 allowClear: true,
                 width: '100%'
             });
+
             $('.unit-select').select2({
                 placeholder: "Select Unit",
                 allowClear: true,
@@ -387,62 +512,30 @@
             updateAmounts();
         });
 
-        document.querySelector('#details-table').addEventListener('click', function (e) {
+        // Xóa 2 hàng của 1 item
+        detailsTable.addEventListener('click', function (e) {
             if (e.target.classList.contains('btn-remove-row')) {
-                e.target.closest('tr').remove();
+                const row1 = e.target.closest('tr');
+                const index = row1.dataset.index;
+                const row2 = document.querySelector('#details-table tbody tr.detail-row-2[data-index="' + index + '"]');
+                if (row2) row2.remove();
+                row1.remove();
                 updateAmounts();
             }
         });
 
-        // phần select2 + gọi API (giữ nguyên logic của bạn)
-        $('#details-table').on('select2:select', async function (e) {
-            const target = e.target;
-            const row = target.closest('tr');
-            if (!row) return;
-
-            if (target.name.includes('.ProduceId')) {
-                const productId = target.value;
-                if (productId) {
-                    try {
-                        const response = await fetch(`/api/ImportProductApi/GetUnits/${productId}`);
-                        if (response.ok) {
-                            const units = await response.json();
-                            const unitSelect = row.querySelector('select[name$=".UnitProductId"]');
-                            if (!unitSelect) return;
-
-                            unitSelect.innerHTML = '<option value="">Select Unit</option>';
-                            units.forEach(unit => {
-                                const option = document.createElement('option');
-                                option.value = unit.value || '';
-                                option.textContent = unit.text || '';
-                                unitSelect.appendChild(option);
-                            });
-                            $(unitSelect).select2();
-                        }
-                    } catch (error) {
-                        console.error(error);
-                    }
-                }
-            } else if (target.name.includes('.UnitProductId')) {
-                const unitId = target.value;
-                if (unitId) {
-                    try {
-                        const response = await fetch(`/api/ImportProductApi/GetUnitDetails/${unitId}`);
-                        if (response.ok) {
-                            const details = await response.json();
-                            row.querySelector('input[name$=".ConvertRate"]').value = details.rate || '';
-                            row.querySelector('input[name$=".Quantity"]').value = 1;
-                            updateAmounts();
-                        }
-                    } catch (error) {
-                        console.error(error);
-                    }
-                }
-            }
-        });
-
+        // Init select2 nếu sau này bạn muốn preload sẵn 1 dòng
         $(document).ready(function () {
-            $('#details-table select').select2({ width: 'resolve' });
+            $('.product-select').select2({
+                placeholder: "Select Product",
+                allowClear: true,
+                width: '100%'
+            });
+            $('.unit-select').select2({
+                placeholder: "Select Unit",
+                allowClear: true,
+                width: '100%'
+            });
         });
     </script>
 }

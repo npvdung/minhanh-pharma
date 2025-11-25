@@ -1,0 +1,94 @@
+@using Base_Asp_Core_MVC_with_Identity.Models.View
+@model ReturnViewModel
+
+@{
+    Layout = null; // in PDF không dùng layout chung
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>@Model.disposalRecordsMaster.ImportId</title>
+    <style>
+        body { font-family: DejaVu Sans, Arial, Helvetica, sans-serif; font-size: 13px; }
+        h2, h3 { text-align: center; margin: 5px 0; }
+        .section-title { font-weight: bold; margin-top: 15px; margin-bottom: 5px; }
+        .info-table { width: 100%; border-collapse: collapse; margin-bottom: 10px; }
+        .info-table td { padding: 4px 6px; vertical-align: top; }
+        .info-label { font-weight: bold; width: 120px; }
+        table.details { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        table.details th, table.details td {
+            border: 1px solid #ccc;
+            padding: 6px 8px;
+            text-align: center;
+        }
+        table.details th { background: #f2f2f2; }
+        .text-right { text-align: right; }
+    </style>
+</head>
+<body>
+    <h2>PHIẾU TRẢ HÀNG NHÀ CUNG CẤP</h2>
+    <h3>@Model.disposalRecordsMaster.ImportId</h3>
+
+    <div class="section-title">Thông tin phiếu trả</div>
+    <table class="info-table">
+        <tr>
+            <td class="info-label">Mã trả hàng:</td>
+            <td>@Model.disposalRecordsMaster.ImportId</td>
+            <td class="info-label">Ngày trả:</td>
+            <td>@Model.disposalRecordsMaster.ReturnDate?.ToString("dd/MM/yyyy HH:mm")</td>
+        </tr>
+        <tr>
+            <td class="info-label">Người lập:</td>
+            <td>@Model.disposalRecordsMaster.UserId</td>
+            <td class="info-label">Lí do trả:</td>
+            <td>@Model.disposalRecordsMaster.Reason</td>
+        </tr>
+        <tr>
+            <td class="info-label">Ghi chú:</td>
+            <td colspan="3">@Model.disposalRecordsMaster.Description</td>
+        </tr>
+        <tr>
+            <td class="info-label">Tổng tiền:</td>
+            <td colspan="3" class="text-right">
+                @String.Format("{0:n0}", Model.disposalRecordsMaster.TotalAmount) ₫
+            </td>
+        </tr>
+    </table>
+
+    <div class="section-title">Chi tiết hàng trả</div>
+    <table class="details">
+        <thead>
+            <tr>
+                <th>STT</th>
+                <th>Tên sản phẩm</th>
+                <th>Mã lô</th>           @* <<< CỘT MÃ LÔ MỚI *@
+                <th>Đơn vị</th>
+                <th>Tỉ lệ</th>
+                <th>Số lượng</th>
+                <th>Giá nhập</th>
+                <th>Thành tiền</th>
+            </tr>
+        </thead>
+        <tbody>
+        @{
+            var stt = 1;
+        }
+        @foreach (var item in Model.ReturnsDetails)
+        {
+            <tr>
+                <td>@stt++</td>
+                <td>@item.ProductId</td>       @* text: Tên + HSD *@
+                <td>@item.ImportId</td>        @* text: MÃ LÔ *@
+                <td>@item.UnitProductId</td>   @* text: Đơn vị *@
+                <td>@item.Description</td>     @* tỉ lệ *@
+                <td>@item.Quantity</td>
+                <td class="text-right">@String.Format("{0:n0}", item.Price)</td>
+                <td class="text-right">@String.Format("{0:n0}", item.TotalAmount)</td>
+            </tr>
+        }
+        </tbody>
+    </table>
+</body>
+</html>

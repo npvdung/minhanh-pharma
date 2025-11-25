@@ -42,10 +42,10 @@
         transition: border-color 0.3s ease;
     }
 
-        .form-control:focus {
-            border-color: #ff7a00;
-            box-shadow: 0 2px 6px rgba(255, 122, 0, 0.1);
-        }
+    .form-control:focus {
+        border-color: #ff7a00;
+        box-shadow: 0 2px 6px rgba(255, 122, 0, 0.1);
+    }
 
     .button-group {
         display: flex;
@@ -68,27 +68,27 @@
         border: none;
     }
 
-        .btn-submit:hover {
-            background-color: #e06f00;
-        }
+    .btn-submit:hover {
+        background-color: #e06f00;
+    }
 
     .btn-add-row {
         background-color: #007bff;
         color: white;
     }
 
-        .btn-add-row:hover {
-            background-color: #0056b3;
-        }
+    .btn-add-row:hover {
+        background-color: #0056b3;
+    }
 
     .btn-remove-row {
         background-color: #dc3545;
         color: white;
     }
 
-        .btn-remove-row:hover {
-            background-color: #a71d2a;
-        }
+    .btn-remove-row:hover {
+        background-color: #a71d2a;
+    }
 
     table {
         width: 100%;
@@ -106,7 +106,7 @@
         background-color: #f8f9fa;
         font-weight: bold;
     }
-    /* Styles for the table */
+
     #details-table {
         width: 100%;
         border-collapse: collapse;
@@ -116,40 +116,39 @@
         box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
     }
 
-        #details-table thead {
-            background-color: #e06f00 !important;
-            color: white;
-            font-weight: bold;
-            text-align: left;
-        }
+    #details-table thead {
+        background-color: #e06f00 !important;
+        color: white;
+        font-weight: bold;
+        text-align: left;
+    }
 
-        #details-table th, #details-table td {
-            padding: 12px 15px;
-            text-align: center;
-            border-bottom: 1px solid #ddd;
-        }
+    #details-table th, #details-table td {
+        padding: 12px 15px;
+        text-align: center;
+        border-bottom: 1px solid #ddd;
+    }
 
-        #details-table tbody tr:nth-child(even) {
-            background-color: #f9f9f9;
-        }
+    #details-table tbody tr:nth-child(even) {
+        background-color: #f9f9f9;
+    }
 
-        #details-table tbody tr:hover {
-            background-color: #f1f1f1;
-            transition: background-color 0.3s ease;
-        }
+    #details-table tbody tr:hover {
+        background-color: #f1f1f1;
+        transition: background-color 0.3s ease;
+    }
 
-        #details-table td input[type="text"],
-        #details-table td input[type="number"],
-        #details-table td input[type="date"],
-        #details-table td select {
-            width: 100%;
-            padding: 8px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            font-size: 14px;
-        }
+    #details-table td input[type="text"],
+    #details-table td input[type="number"],
+    #details-table td input[type="date"],
+    #details-table td select {
+        width: 100%;
+        padding: 8px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        font-size: 14px;
+    }
 
-    /* Styles for buttons */
     button {
         padding: 10px 15px;
         font-size: 14px;
@@ -160,7 +159,6 @@
         transition: background-color 0.3s ease, transform 0.2s ease;
     }
 
-    /* Add Row Button */
     .btn-add-row {
         background-color: #FC8F54;
         color: white;
@@ -168,32 +166,24 @@
         display: inline-block;
     }
 
-        .btn-add-row:hover {
-            background-color: #FC8F54;
-            transform: scale(1.05);
-        }
+    .btn-add-row:hover {
+        background-color: #FC8F54;
+        transform: scale(1.05);
+    }
 
-    /* Remove Row Button */
     .btn-remove-row {
         background-color: #dc3545;
         color: white;
     }
 
-        .btn-remove-row:hover {
-            background-color: #c82333;
-            transform: scale(1.05);
-        }
-
-    #details-table thead {
-        background-color: #e06f00 !important;
-        color: white;
-        font-weight: bold;
-        text-align: left;
-    }
-    span.select2-selection.select2-selection--single{
-        height:45px;
+    .btn-remove-row:hover {
+        background-color: #c82333;
+        transform: scale(1.05);
     }
 
+    span.select2-selection.select2-selection--single {
+        height: 45px;
+    }
 </style>
 
 <div class="form-wrapper">
@@ -203,56 +193,51 @@
             <!-- Master Section -->
             <div class="row">
                 @Html.HiddenFor(m => m.Sales.ID)
+
                 <div class="form-group col-md-6">
                     @Html.LabelFor(model => model.Sales.InvoiceCode, htmlAttributes: new { @class = "control-label" })
-                    <input type="text" class="form-control" asp-for="Sales.InvoiceCode">
+                    <input type="text" class="form-control" asp-for="Sales.InvoiceCode" readonly />
                     <span asp-validation-for="Sales.InvoiceCode" class="alert-danger"></span>
                 </div>
+
                 <div class="form-group col-md-6">
                     @Html.LabelFor(model => model.Sales.Description, htmlAttributes: new { @class = "control-label" })
-                    <input type="text" class="form-control" asp-for="Sales.Description">
+                    <input type="text" class="form-control" asp-for="Sales.Description" />
                     <span asp-validation-for="Sales.Description" class="alert-danger"></span>
                 </div>
+
                 <div class="form-group col-md-6">
                     @Html.LabelFor(model => model.Sales.InvoiceDate, htmlAttributes: new { @class = "control-label" })
-                    <input type="text" class="form-control" asp-for="Sales.InvoiceDate">
+                    <input type="text" class="form-control" asp-for="Sales.InvoiceDate" readonly />
                     <span asp-validation-for="Sales.InvoiceDate" class="alert-danger"></span>
                 </div>
+
                 <div class="form-group col-md-6">
                     @Html.LabelFor(model => model.Sales.UserId, htmlAttributes: new { @class = "control-label" })
-                    @Html.DropDownListFor(model => model.Sales.UserId, new SelectList(ViewBag.account_lst, "Value","Text"),
-                    "Chọn người dùng",
-                    htmlAttributes: new { @id = "supplier", @class = "form-control col-md-4" })
+                    @Html.DropDownListFor(
+                        model => model.Sales.UserId,
+                        new SelectList(ViewBag.account_lst, "Value", "Text", Model.Sales.UserId),
+                        "Chọn người dùng",
+                        htmlAttributes: new { @id = "supplier", @class = "form-control col-md-4" })
                     <span asp-validation-for="Sales.UserId" class="alert-danger"></span>
                 </div>
+
                 <div class="form-group col-md-6">
                     @Html.LabelFor(model => model.Sales.CustomerId, htmlAttributes: new { @class = "control-label" })
-                    @Html.DropDownListFor(model => model.Sales.CustomerId, new SelectList(ViewBag.customer_lst,"Text", "Value"),
-                    "Chọn người dùng",
-                    htmlAttributes: new { @id = "customer-select", @class = "form-control col-md-4" })
+                    @Html.DropDownListFor(
+                        model => model.Sales.CustomerId,
+                        new SelectList(ViewBag.customer_lst, "Value", "Text", Model.Sales.CustomerId),
+                        "Chọn khách hàng",
+                        htmlAttributes: new { @id = "customer-select", @class = "form-control col-md-4" })
                     <span asp-validation-for="Sales.CustomerId" class="alert-danger"></span>
                 </div>
+
                 <div class="form-group col-md-6">
                     @Html.LabelFor(model => model.Sales.TotalAmount, htmlAttributes: new { @class = "control-label" })
-                    <input type="number" class="form-control" asp-for="Sales.TotalAmount" id="TotalAmountMaster">
+                    <input type="number" class="form-control" asp-for="Sales.TotalAmount" id="TotalAmountMaster" readonly />
                     <span asp-validation-for="Sales.TotalAmount" class="alert-danger"></span>
                 </div>
             </div>
-
-            <!-- Hidden Template for Dropdown -->
-            <select id="product-template" style="display: none;">
-                @foreach (var item in ViewBag.product_lst as List<SelectListItem>)
-                {
-                    <option value="@item.Value">@item.Text</option>
-                }
-            </select>
-
-            <select id="unit-template" style="display: none;">
-                @foreach (var item in ViewBag.unit_lst as List<SelectListItem>)
-                {
-                    <option value="@item.Value">@item.Text</option>
-                }
-            </select>
 
             <!-- Details Section -->
             <h3 class="form-title">Chi tiết sản phẩm</h3>
@@ -272,45 +257,47 @@
                     {
                         <tr>
                             @Html.HiddenFor(m => m.salesProductsDetails[i].ID)
+
                             <td>
-                                @Html.DropDownListFor(m => m.salesProductsDetails[i].ProductId,
-                            new SelectList(ViewBag.product_lst, "Value", "Text", Model.salesProductsDetails[i].ProductId),
-                            "Choose Product", new { @class = "form-control" })
+                                @Html.DropDownListFor(
+                                    m => m.salesProductsDetails[i].ProductId,
+                                    new SelectList(ViewBag.product_lst, "Value", "Text", Model.salesProductsDetails[i].ProductId),
+                                    "Choose Product",
+                                    new { @class = "form-control" })
                                 @Html.HiddenFor(m => m.salesProductsDetails[i].ProductId)
                             </td>
-                              <td>
 
-                                @Html.DropDownListFor(m => m.salesProductsDetails[i].UnitProductId,
-                            new SelectList(ViewBag.unit_lst, "Value", "Text", Model.salesProductsDetails[i].UnitProductId),
-                            "Choose Unit", new { @class = "form-control" })
+                            <td>
+                                @Html.DropDownListFor(
+                                    m => m.salesProductsDetails[i].UnitProductId,
+                                    new SelectList(ViewBag.unit_lst, "Value", "Text", Model.salesProductsDetails[i].UnitProductId),
+                                    "Choose Unit",
+                                    new { @class = "form-control" })
                                 @Html.HiddenFor(m => m.salesProductsDetails[i].UnitProductId)
                             </td>
-                      
+
                             <td>
                                 @Html.EditorFor(m => m.salesProductsDetails[i].Description, new { htmlAttributes = new { @class = "form-control" } })
                             </td>
+
                             <td>
                                 @Html.EditorFor(m => m.salesProductsDetails[i].Quantity, new { htmlAttributes = new { @class = "form-control" } })
                             </td>
+
                             <td>
                                 @Html.EditorFor(m => m.salesProductsDetails[i].Price, new { htmlAttributes = new { @class = "form-control" } })
                             </td>
+
                             <td>
                                 @Html.EditorFor(m => m.salesProductsDetails[i].TotalAmount, new { htmlAttributes = new { @class = "form-control", @readonly = "readonly" } })
                             </td>
-
                         </tr>
-
                     }
-
-                    <!-- JS sẽ thêm các dòng tại đây -->
                 </tbody>
             </table>
-            @*<button type="button" class="btn-add-row">+ Thêm dòng</button>*@
 
             <!-- Submit Section -->
             <div class="button-group">
-                @*<button type="submit" class="btn-submit"><i class="bi bi-save"></i> Update</button>*@
                 <a asp-controller="Invoice" asp-action="Index" class="btn btn-cancel">Back</a>
             </div>
         </form>
@@ -323,79 +310,42 @@
         function updateAmounts() {
             let totalAmountMaster = 0;
 
-            // Duyệt qua tất cả các dòng trong bảng
             document.querySelectorAll('#details-table tbody tr').forEach(row => {
                 const quantity = parseFloat(row.querySelector('input[name$=".Quantity"]').value) || 0;
-                const convertRate = parseFloat(row.querySelector('input[name$=".ConvertRate"]').value) || 0;
-                const importPrice = parseFloat(row.querySelector('input[name$=".ImportPrice"]').value) || 0;
+                const rate = parseFloat(row.querySelector('input[name$=".Description"]').value) || 0; // dùng Description làm tỉ lệ
+                const price = parseFloat(row.querySelector('input[name$=".Price"]').value) || 0;
 
-                // Tính thành tiền
-                const totalAmount = quantity * convertRate * importPrice;
-                row.querySelector('input[name$=".TotalAmount"]').value = totalAmount.toFixed(2);
+                const totalAmount = quantity * rate * price;
+                const totalInput = row.querySelector('input[name$=".TotalAmount"]');
+                if (totalInput) {
+                    totalInput.value = totalAmount.toFixed(2);
+                }
 
-                // Cộng dồn vào tổng tiền master
                 totalAmountMaster += totalAmount;
             });
+
             $('#TotalAmountMaster').val(totalAmountMaster.toFixed(2));
-            // Cập nhật tổng tiền master
         }
 
-        // Xử lý khi người dùng nhập dữ liệu vào các trường Quantity, ConvertRate, ImportPrice
+        // Tự động tính lại khi nhập Quantity / Description (tỉ lệ) / Price
         document.querySelector('#details-table').addEventListener('input', function (e) {
             if (
                 e.target.matches('input[name$=".Quantity"]') ||
-                e.target.matches('input[name$=".ConvertRate"]') ||
-                e.target.matches('input[name$=".ImportPrice"]')
+                e.target.matches('input[name$=".Description"]') ||
+                e.target.matches('input[name$=".Price"]')
             ) {
-                updateAmounts(); // Gọi hàm cập nhật
+                updateAmounts();
             }
         });
 
         $(document).ready(function () {
             $('#customer-select').select2({
-                placeholder: "Chọn người dùng", // Placeholder hiển thị
-                allowClear: true               // Cho phép xóa lựa chọn
+                placeholder: "Chọn khách hàng",
+                allowClear: true
             });
+
+            // tính tổng tiền lúc load trang
+            updateAmounts();
         });
-
-                        //// Thêm dòng mới và gắn sự kiện tính toán
-                        //document.querySelector('.btn-add-row').addEventListener('click', function () {
-                        //    const tableBody = document.querySelector('#details-table tbody');
-                        //    const rowIndex = tableBody.querySelectorAll('tr').length;
-
-                        //    const newRow = `
-                        //                            <tr>
-                        //                                <td>
-                        //                                    <select name="ProductDetails[${rowIndex}].ProduceId" class="form-control">
-                        //                                        <option value="">Select Product</option>
-                        //                                        ${document.getElementById('product-template').innerHTML}
-                        //                                    </select>
-                        //                                </td>
-                        //                                        <td><input type="date" name="ProductDetails[${rowIndex}].ManufacturingDate" class="form-control" /></td>
-                        //                                        <td><input type="date" name="ProductDetails[${rowIndex}].ExpirationData" class="form-control" /></td>
-                        //                                <td><input type="text" name="ProductDetails[${rowIndex}].Unit" class="form-control" /></td>
-                        //                                <td><input type="number" name="ProductDetails[${rowIndex}].ConvertRate" class="form-control" /></td>
-                        //                                <td><input type="number" name="ProductDetails[${rowIndex}].Quantity" class="form-control" /></td>
-                        //                                <td><input type="number" name="ProductDetails[${rowIndex}].ImportPrice" class="form-control" /></td>
-                        //                                <td><input type="number" name="ProductDetails[${rowIndex}].TotalAmount" class="form-control" readonly /></td>
-                        //                                <td><button type="button" class="btn-remove-row btn btn-danger">Xóa</button></td>
-                        //                            </tr>`;
-
-                        //    tableBody.insertAdjacentHTML('beforeend', newRow);
-
-                        //    // Cập nhật lại tổng tiền nếu có thay đổi
-                        //    updateAmounts();
-                        //});
-
-                        //// Xóa dòng
-                        //document.querySelector('#details-table').addEventListener('click', function (e) {
-                        //    if (e.target.classList.contains('btn-remove-row')) {
-                        //        e.target.closest('tr').remove();
-                        //        updateAmounts(); // Cập nhật lại tổng tiền master
-                        //    }
-                        //});
     </script>
-
 }
-
-

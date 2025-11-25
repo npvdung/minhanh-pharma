@@ -12,7 +12,7 @@ namespace Base_Asp_Core_MVC_with_Identity.Models
         [Required]
         [Display(Name = "Tên loại thuốc")]
         public string CategoryName { get; set; }
-        [Display(Name = "Mô tả")]
+        [Display(Name = "Công dụng")]
         public string? Description { get; set; }
     }
 }

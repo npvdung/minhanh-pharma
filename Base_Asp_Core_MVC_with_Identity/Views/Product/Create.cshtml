@@ -203,7 +203,13 @@
 <div class="form-wrapper">
     <div class="form-container">
         <h2 class="form-title">Thêm mới thông tin sản phẩm</h2>
-        <form method="post" class="form-content">
+        <form asp-action="Create"
+            asp-controller="Product"
+            method="post"
+            asp-antiforgery="true"
+            class="form-content">
+            @Html.ValidationSummary(false, "", new { @class = "text-danger" })
+
             <div class="row">
                 <div class="form-group col-md-6">
                     @Html.LabelFor(model => model.productMaster.ProductCode, htmlAttributes: new { @class = "control-label col-md-4" })
@@ -266,6 +272,16 @@
                     <input type="text" class="form-control mb-3 col-md-8" asp-for="productMaster.Note" placeholder="Nhập mô tả">
                 </div>
             </div>
+            @if (ViewBag.ModelErrors != null)
+            {
+                <ul style="color:red">
+                @foreach (var e in ViewBag.ModelErrors)
+                {
+                    <li>@e.Field: @string.Join(", ", e.Errors)</li>
+                }
+                </ul>
+            }
+
 
             <h3 class="form-title">Chi tiết đơn vị sản phẩm</h3>
             <table id="details-table">

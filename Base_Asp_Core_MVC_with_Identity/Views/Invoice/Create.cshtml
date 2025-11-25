@@ -160,6 +160,11 @@
         transition: background-color 0.3s ease, transform 0.2s ease;
     }
 
+    #details-table td:first-child {
+        width: 420px;
+        max-width: 400px;
+    }
+
     /* Add Row Button */
     .btn-add-row {
         background-color: #FC8F54;
@@ -229,11 +234,15 @@
 
                 <div class="form-group col-md-6">
                     @Html.LabelFor(model => model.Sales.CustomerId, htmlAttributes: new { @class = "control-label" })
-                    @Html.DropDownListFor(model => model.Sales.CustomerId, new SelectList(ViewBag.customer_lst,"Text", "Value"),
-                    "Chọn người dùng",
-                    htmlAttributes: new { @id = "customer-select", @class = "form-control col-md-4" })
+                    @Html.DropDownListFor(
+                        model => model.Sales.CustomerId,
+                        // ĐÚNG: Value = ID, Text = Tên KH
+                        new SelectList(ViewBag.customer_lst, "Value", "Text"),
+                        "Chọn khách hàng",
+                        htmlAttributes: new { @id = "customer-select", @class = "form-control col-md-4" })
                     <span asp-validation-for="Sales.CustomerId" class="alert-danger"></span>
                 </div>
+
                 <div class="form-group col-md-6">
                     @Html.LabelFor(model => model.Sales.TotalAmount, htmlAttributes: new { @class = "control-label" })
                     <input type="number" class="form-control" asp-for="Sales.TotalAmount" id="TotalAmountMaster">
@@ -304,7 +313,6 @@
         // Tính toán "Thành tiền" và cập nhật "Tổng tiền" của master
         function updateAmounts() {
             let totalAmountMaster = 0;
-            debugger;
             // Duyệt qua tất cả các dòng trong bảng
             document.querySelectorAll('#details-table tbody tr').forEach(row => {
                 const quantity = parseFloat(row.querySelector('input[name$=".Quantity"]').value) || 0;
@@ -431,7 +439,6 @@
                     const response = await fetch(`/api/ImportProductApi/GetUnitDetails/${unitId}`);
                     if (response.ok) {
                         const details = await response.json();
-                        debugger;
                         // Gán dữ liệu vào các trường ConvertRate và Quantity
                         row.querySelector('input[name$=".Description"]').value = details.rate || '';
                         row.querySelector('input[name$=".Quantity"]').value = 1;

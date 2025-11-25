@@ -1,6 +1,7 @@
 ﻿using Base_Asp_Core_MVC_with_Identity.Data;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using System.Linq;
 using System.Linq.Dynamic.Core;
 
 namespace Base_Asp_Core_MVC_with_Identity.Controllers
@@ -22,11 +23,6 @@ namespace Base_Asp_Core_MVC_with_Identity.Controllers
         {
             try
             {
-                //isAdmin = User.IsInRole(Roles.Admin.ToString()) ? true : false;
-                //isDoctor = User.IsInRole(Roles.Doctor.ToString()) ? true : false;
-                //isParent = User.IsInRole(Roles.Parent.ToString()) ? true : false;
-                //idUser = _uid.GetUserId(HttpContext.User);
-
                 var draw = Request.Query["draw"].FirstOrDefault();
                 var start = Request.Query["start"].FirstOrDefault();
                 var length = Request.Query["length"].FirstOrDefault();
@@ -48,16 +44,42 @@ namespace Base_Asp_Core_MVC_with_Identity.Controllers
                 }
 
                 recordsTotal = customerData.Count();
-                int sttCounter = skip + 1;
                 var data = customerData.Skip(skip).Take(pageSize).ToList();
                 var jsonData = new { draw = draw, recordsFiltered = recordsTotal, recordsTotal = recordsTotal, data = data };
                 return Ok(jsonData);
 
             }
-            catch (Exception ex)
+            catch
             {
                 throw;
             }
+        }
+
+        // ====== XOÁ NHÀ CUNG CẤP CÓ RÀNG BUỘC ======
+        [HttpDelete]
+        [Route("DeleteEmp")]
+        public IActionResult DeleteEmp(Guid id)
+        {
+            var supplier = _context.suppliers.Find(id);
+            if (supplier == null)
+            {
+                return NotFound();
+            }
+
+            var supplierIdString = supplier.ID.ToString();
+
+            // Nếu đang có sản phẩm hoặc phiếu nhập dùng NCC này thì không xoá
+            var hasProducts = _context.Products.Any(p => p.SupplierId == supplierIdString);
+            var hasImports = _context.ImportsProduct.Any(ip => ip.SupplierId == supplierIdString);
+
+            if (hasProducts || hasImports)
+            {
+                return BadRequest("Không thể xoá nhà cung cấp này vì đang được sử dụng trong sản phẩm hoặc phiếu nhập.");
+            }
+
+            _context.suppliers.Remove(supplier);
+            _context.SaveChanges();
+            return Ok("Xoá nhà cung cấp thành công.");
         }
     }
 }

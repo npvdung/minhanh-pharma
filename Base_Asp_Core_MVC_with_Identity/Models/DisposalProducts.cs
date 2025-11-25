@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Base_Asp_Core_MVC_with_Identity.Models
 {
@@ -16,7 +17,7 @@ namespace Base_Asp_Core_MVC_with_Identity.Models
         [Display(Name = "Sản phẩm")]
         public string? ProductId { get; set; }
 
-        [Display(Name = "Ghi chú")]
+        [Display(Name = "Ghi chú / Tỉ lệ")]
         public string? Description { get; set; }
 
         [Display(Name = "Ngày hủy")]
@@ -31,7 +32,7 @@ namespace Base_Asp_Core_MVC_with_Identity.Models
         [Display(Name = "Đơn giá")]
         public decimal? Price { get; set; }
 
-        [Display(Name = "Giá nhập")]
+        [Display(Name = "Giá nhập (nếu dùng)")]
         public decimal? ImportPrice { get; set; }
 
         [Display(Name = "Thành tiền")]
@@ -40,9 +41,7 @@ namespace Base_Asp_Core_MVC_with_Identity.Models
         [Display(Name = "Đơn vị quy đổi")]
         public string? UnitProductId { get; set; }
 
-        [NotMapped]
-        [Display(Name = "Lô nhập")]
+        [Display(Name = "Lô nhập (ID lô trong kho)")]
         public string? ImportId { get; set; }
     }
-
 }

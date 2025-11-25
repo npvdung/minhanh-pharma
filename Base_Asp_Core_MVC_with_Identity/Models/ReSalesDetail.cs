@@ -45,7 +45,6 @@ namespace Base_Asp_Core_MVC_with_Identity.Models
         [Display(Name = "Tỷ lệ quy đổi")]
         public int? ConvertRate { get; set; }
 
-        [NotMapped]
         [Display(Name = "Lô nhập")]
         public string? ImportId { get; set; }
     }

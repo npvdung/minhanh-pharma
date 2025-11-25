@@ -203,8 +203,13 @@
 
 <div class="form-wrapper">
     <div class="form-container">
-        <h2 class="form-title">Cập nhật thông tin Import</h2>
-        <form method="post" id="import-form">
+        <h2 class="form-title">Cập nhật thông tin nhập hàng</h2>
+        <form asp-action="Edit"
+            asp-controller="ImportProduct"
+            method="post"
+            asp-antiforgery="true"
+            id="import-form">
+
             <div class="row">
                 @Html.HiddenFor(m => m.ImportMaster.ID)
                 <div class="form-group col-md-6">
@@ -269,14 +274,16 @@
             <table id="details-table">
                 <thead>
                     <tr>
-                        <th style="background-color: #e06f00 !important; width: 300px;">Tên sản phẩm</th>
-                        <th style="background-color: #e06f00 !important; width: 100px;">Ngày sản xuất</th>
-                        <th style="background-color: #e06f00 !important; width: 100px;">Ngày hết hạn</th>
-                        <th style="background-color: #e06f00 !important; width: 120px;">Đơn vị</th>
-                        <th style="background-color: #e06f00 !important; width: 100px;">Tỉ lệ</th>
-                        <th style="background-color: #e06f00 !important; width: 100px;">Số lượng</th>
-                        <th style="background-color: #e06f00 !important; width: 100px;">Giá nhập</th>
-                        <th style="background-color: #e06f00 !important; width: 150px;">Thành tiền</th>
+                        <th style="background-color:#e06f00 !important;">Tên sản phẩm</th>
+                        <th style="background-color:#e06f00 !important;">Ngày sản xuất</th>
+                        <th style="background-color:#e06f00 !important;">Ngày hết hạn</th>
+                        <th style="background-color:#e06f00 !important;">Đơn vị</th>
+                        <th style="background-color:#e06f00 !important;">Tỉ lệ</th>
+                        <th style="background-color:#e06f00 !important;">Số lượng</th>
+                        <th style="background-color:#e06f00 !important;">Giá nhập</th>
+                        <th style="background-color:#e06f00 !important;">Thành tiền</th>
+                        <th style="background-color:#e06f00 !important;">Mã lô nhập</th>   @* <-- thêm *@
+                        <th style="background-color:#e06f00 !important;"></th>
                     </tr>
                 </thead>
                 <tbody>
@@ -315,6 +322,10 @@
                             </td>
                             <td>
                                 @Html.EditorFor(m => m.ProductDetails[i].TotalAmount, new { htmlAttributes = new { @class = "form-control", @readonly = "readonly" } })
+                            </td>
+                            <td>
+                                @Html.EditorFor(m => m.ProductDetails[i].BatchCode,
+                                    new { htmlAttributes = new { @class = "form-control", @readonly = "readonly" }})
                             </td>
                         </tr>
                     }

@@ -218,8 +218,13 @@
 
 <div class="form-wrapper">
     <div class="form-container">
-        <h2 class="form-title">Update information product</h2>
-        <form method="post" class="form-content">
+        <h2 class="form-title">Cập nhật thông tin thuốc</h2>
+        <form asp-action="Edit"
+            asp-controller="Product"
+            method="post"
+            asp-antiforgery="true"
+            class="form-content">
+
             <div class="row">
                 @Html.HiddenFor(m => m.productMaster.ID)
                 <div class="form-group col-md-6">

@@ -23,7 +23,7 @@ namespace Base_Asp_Core_MVC_with_Identity.Models
         [Display(Name = "Nhà cung cấp")]
         public string? SupplierId { get; set; }
 
-        [Display(Name = "Đơn vị tính")]
+        [Display(Name = "Đơn vị bán lẻ nhỏ nhất")]
         public string? Unit { get; set; }
 
         [Display(Name = "Giá bán")]
@@ -32,7 +32,7 @@ namespace Base_Asp_Core_MVC_with_Identity.Models
         [Display(Name = "Thành phần")]
         public string? Ingredient { get; set; }
 
-        [Display(Name = "Hàm lượng / Quy cách")]
+        [Display(Name = "Cách đóng gói")]
         public string? Content { get; set; }
 
         [Display(Name = "Công dụng")]

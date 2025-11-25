@@ -42,7 +42,7 @@ namespace Base_Asp_Core_MVC_with_Identity.Migrations
                     b.Property<DateTime?>("DateOfBirth")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime(6)")
-                        .HasDefaultValue(new DateTime(2024, 12, 7, 14, 27, 20, 489, DateTimeKind.Local).AddTicks(7170));
+                        .HasDefaultValue(new DateTime(2025, 11, 25, 14, 23, 48, 793, DateTimeKind.Local).AddTicks(7680));
 
                     b.Property<string>("Email")
                         .HasMaxLength(256)
@@ -196,6 +196,9 @@ namespace Base_Asp_Core_MVC_with_Identity.Migrations
                         .IsRequired()
                         .HasColumnType("longtext");
 
+                    b.Property<string>("ImportId")
+                        .HasColumnType("longtext");
+
                     b.Property<decimal?>("ImportPrice")
                         .HasColumnType("decimal(65,30)");
 
@@ -306,11 +309,13 @@ namespace Base_Asp_Core_MVC_with_Identity.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("char(36)");
 
+                    b.Property<string>("BatchCode")
+                        .HasColumnType("longtext");
+
                     b.Property<double?>("ConvertRate")
                         .HasColumnType("double");
 
                     b.Property<string>("Description")
-                        .IsRequired()
                         .HasColumnType("longtext");
 
                     b.Property<DateTime?>("ExpirationData")
@@ -321,7 +326,6 @@ namespace Base_Asp_Core_MVC_with_Identity.Migrations
                         .HasColumnType("decimal(65,30)");
 
                     b.Property<string>("ImportProductId")
-                        .IsRequired()
                         .HasColumnType("longtext");
 
                     b.Property<DateTime?>("ManufacturingDate")
@@ -415,7 +419,6 @@ namespace Base_Asp_Core_MVC_with_Identity.Migrations
                         .HasColumnType("decimal(65,30)");
 
                     b.Property<string>("ProductId")
-                        .IsRequired()
                         .HasColumnType("longtext");
 
                     b.Property<int?>("Rate")
@@ -473,6 +476,9 @@ namespace Base_Asp_Core_MVC_with_Identity.Migrations
                         .HasColumnType("datetime(6)");
 
                     b.Property<string>("Description")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("ImportId")
                         .HasColumnType("longtext");
 
                     b.Property<decimal?>("Price")
@@ -622,6 +628,9 @@ namespace Base_Asp_Core_MVC_with_Identity.Migrations
                     b.Property<Guid>("ID")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("char(36)");
+
+                    b.Property<string>("BatchCode")
+                        .HasColumnType("longtext");
 
                     b.Property<double?>("Conversion_rate")
                         .HasColumnType("double");

@@ -25,9 +25,9 @@
     }
     public enum EnumApprodImport
     {
-        [Display(Name = "Waiting")]
+        [Display(Name = "Đang chờ")]
         Wait,
-        [Display(Name = "Approved")]
+        [Display(Name = "Đã duyệt")]
         approved
     }
 }

@@ -2,7 +2,6 @@
 using Base_Asp_Core_MVC_with_Identity.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using System;
 
 namespace Base_Asp_Core_MVC_with_Identity.Controllers
 {
@@ -18,59 +17,46 @@ namespace Base_Asp_Core_MVC_with_Identity.Controllers
             _uid = uid;
             _context = context;
         }
+
         public IActionResult Index()
         {
             try
             {
-                //isAdmin = User.IsInRole(Roles.Admin.ToString()) ? true : false;
-                //isDoctor = User.IsInRole(Roles.Doctor.ToString()) ? true : false;
-                //isParent = User.IsInRole(Roles.Parent.ToString()) ? true : false;
-                //idUser = _uid.GetUserId(HttpContext.User);
-
                 var draw = Request.Query["draw"].FirstOrDefault();
                 var start = Request.Query["start"].FirstOrDefault();
                 var length = Request.Query["length"].FirstOrDefault();
                 var sortColumn = Request.Query["columns[" + Request.Query["order[0][column]"].FirstOrDefault() + "][name]"].FirstOrDefault();
                 var sortColumnDirection = Request.Query["order[0][dir]"].FirstOrDefault();
                 var searchValue = Request.Query["search[value]"].FirstOrDefault();
+
                 int pageSize = length != null ? Convert.ToInt32(length) : 0;
                 int skip = start != null ? Convert.ToInt32(start) : 0;
                 int recordsTotal = 0;
-                var customerData = (from tempcustomer in _context.Categories select tempcustomer);
 
-                //var customerData = from tempcustomer in _context.Categories
-                //                   join usersTable in _uid.Users on tempcustomer.CreateId equals usersTable.Id into tempTable
-                //                   from leftJoinData in tempTable.DefaultIfEmpty()
-                //                   select new
-                //                   {
-                //                       // Chọn các trường từ bảng Childrens và OtherTable
-                //                       tempcustomer.Id,
-                //                       tempcustomer.Title,
-                //                       tempcustomer.Content,
-                //                       //tempcustomer.Description,
-                //                       // Thêm các trường khác từ OtherTable
-                //                       leftJoinData.FirstName,
-                //                       leftJoinData.LastName
-                //                   };
+                var customerData = (from tempcustomer in _context.Categories
+                                    select tempcustomer);
+
                 if (!(string.IsNullOrEmpty(sortColumn) && string.IsNullOrEmpty(sortColumnDirection)))
                 {
                     customerData = customerData.OrderBy(sortColumn + " " + sortColumnDirection);
                 }
+
                 if (!string.IsNullOrEmpty(searchValue))
                 {
-                    customerData = customerData.Where(m => m.CategoryName.Contains(searchValue) || m.CategoryCode.Contains(searchValue));
+                    customerData = customerData.Where(m =>
+                        m.CategoryName.Contains(searchValue) ||
+                        m.CategoryCode.Contains(searchValue));
                 }
 
                 recordsTotal = customerData.Count();
-                int sttCounter = skip + 1;
                 var data = customerData.Skip(skip).Take(pageSize).ToList();
                 var jsonData = new { draw = draw, recordsFiltered = recordsTotal, recordsTotal = recordsTotal, data = data };
                 return Ok(jsonData);
-
             }
-            catch (Exception ex)
+            catch
             {
-                throw;
+                // Có thể log thêm nếu muốn
+                return StatusCode(500, "Đã xảy ra lỗi khi tải dữ liệu.");
             }
         }
 
@@ -78,21 +64,38 @@ namespace Base_Asp_Core_MVC_with_Identity.Controllers
         [Route("DeleteEmp")]
         public IActionResult DeleteEmp(Guid id)
         {
-            var deleterecord = _context.Categories.Find(id);
-            if (deleterecord == null)
+            try
             {
-                return NotFound();
+                var category = _context.Categories.Find(id);
+                if (category == null)
+                {
+                    return NotFound("Không tìm thấy loại thuốc cần xoá.");
+                }
+
+                // ❗ Kiểm tra xem có sản phẩm nào đang dùng Category này không
+                bool hasProducts = _context.Products
+                    .Any(p => p.CategoryId == category.ID.ToString());
+
+                if (hasProducts)
+                {
+                    return BadRequest("Không thể xoá loại thuốc này vì đang có mặt hàng thuộc loại thuốc này. Vui lòng đổi loại hoặc xoá các mặt hàng đó trước.");
+                }
+
+                _context.Categories.Remove(category);
+                _context.SaveChanges();
+
+                return Ok("Xoá loại thuốc thành công.");
             }
-            _context.Categories.Remove(deleterecord);
-            _context.SaveChanges();
-            return Ok();
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Có lỗi xảy ra khi xoá: " + ex.Message);
+            }
         }
 
         [HttpPost]
         public async Task<IActionResult> SendMes(Category model)
         {
-            // Thực hiện xử lý logic của bạn
-            // Sau khi thực hiện thành công thao tác
+            // Giữ nguyên logic placeholder của bạn
             return Ok("Thao tác đã thành công.");
         }
     }

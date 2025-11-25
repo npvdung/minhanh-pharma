@@ -6,12 +6,10 @@ namespace Base_Asp_Core_MVC_with_Identity.Models
     {
         [Key]
         public Guid ID { get; set; }
-        [Required]
-        public string ImportProductId { get; set; }
+        public string? ImportProductId { get; set; }
         [Required]
         [Display(Name = "Tên sản phẩm")]
         public string? ProduceId { get; set; }
-        [Required]
         public string? Description { get; set; }
         public DateTime? ProductionBatch { get; set; }
         [Required]
@@ -26,6 +24,7 @@ namespace Base_Asp_Core_MVC_with_Identity.Models
         public decimal? Price { get; set; }
         public decimal? ImportPrice { get; set; }
         public decimal? TotalAmount { get; set; }
+        public string? BatchCode { get; set; }
         public string? UnitProductId { get; set; }
     }
 }

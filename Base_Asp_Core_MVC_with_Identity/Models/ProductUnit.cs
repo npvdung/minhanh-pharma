@@ -10,7 +10,7 @@ namespace Base_Asp_Core_MVC_with_Identity.Models
         public Guid ID { get; set; }
 
         [Display(Name = "Thuốc / Sản phẩm")]
-        public string ProductId { get; set; }
+        public string? ProductId { get; set; }
 
         [Display(Name = "Tên đơn vị (VD: Hộp, Vỉ, Viên...)")]
         public string UnitName { get; set; }

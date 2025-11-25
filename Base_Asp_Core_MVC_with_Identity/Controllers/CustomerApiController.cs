@@ -1,6 +1,7 @@
 ﻿using Base_Asp_Core_MVC_with_Identity.Data;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using System.Linq;
 using System.Linq.Dynamic.Core;
 
 namespace Base_Asp_Core_MVC_with_Identity.Controllers
@@ -22,11 +23,6 @@ namespace Base_Asp_Core_MVC_with_Identity.Controllers
         {
             try
             {
-                //isAdmin = User.IsInRole(Roles.Admin.ToString()) ? true : false;
-                //isDoctor = User.IsInRole(Roles.Doctor.ToString()) ? true : false;
-                //isParent = User.IsInRole(Roles.Parent.ToString()) ? true : false;
-                //idUser = _uid.GetUserId(HttpContext.User);
-
                 var draw = Request.Query["draw"].FirstOrDefault();
                 var start = Request.Query["start"].FirstOrDefault();
                 var length = Request.Query["length"].FirstOrDefault();
@@ -38,20 +34,6 @@ namespace Base_Asp_Core_MVC_with_Identity.Controllers
                 int recordsTotal = 0;
                 var customerData = (from tempcustomer in _context.Customers select tempcustomer);
 
-                //var customerData = from tempcustomer in _context.Categories
-                //                   join usersTable in _uid.Users on tempcustomer.CreateId equals usersTable.Id into tempTable
-                //                   from leftJoinData in tempTable.DefaultIfEmpty()
-                //                   select new
-                //                   {
-                //                       // Chọn các trường từ bảng Childrens và OtherTable
-                //                       tempcustomer.Id,
-                //                       tempcustomer.Title,
-                //                       tempcustomer.Content,
-                //                       //tempcustomer.Description,
-                //                       // Thêm các trường khác từ OtherTable
-                //                       leftJoinData.FirstName,
-                //                       leftJoinData.LastName
-                //                   };
                 if (!(string.IsNullOrEmpty(sortColumn) && string.IsNullOrEmpty(sortColumnDirection)))
                 {
                     customerData = customerData.OrderBy(sortColumn + " " + sortColumnDirection);
@@ -62,16 +44,39 @@ namespace Base_Asp_Core_MVC_with_Identity.Controllers
                 }
 
                 recordsTotal = customerData.Count();
-                int sttCounter = skip + 1;
                 var data = customerData.Skip(skip).Take(pageSize).ToList();
                 var jsonData = new { draw = draw, recordsFiltered = recordsTotal, recordsTotal = recordsTotal, data = data };
                 return Ok(jsonData);
 
             }
-            catch (Exception ex)
+            catch
             {
                 throw;
             }
+        }
+
+        // ====== THÊM HÀM XOÁ CÓ RÀNG BUỘC ĐƠN HÀNG ======
+        [HttpDelete]
+        [Route("DeleteEmp")]
+        public IActionResult DeleteEmp(Guid id)
+        {
+            var customer = _context.Customers.Find(id);
+            if (customer == null)
+            {
+                return NotFound();
+            }
+
+            // RÀNG BUỘC: khách hàng đã có hoá đơn thì không cho xoá
+            var hasInvoices = _context.Invoices.Any(i => i.CustomerId == customer.ID.ToString());
+
+            if (hasInvoices)
+            {
+                return BadRequest("Không thể xoá khách hàng này vì đã phát sinh hoá đơn.");
+            }
+
+            _context.Customers.Remove(customer);
+            _context.SaveChanges();
+            return Ok("Xoá khách hàng thành công.");
         }
     }
 }

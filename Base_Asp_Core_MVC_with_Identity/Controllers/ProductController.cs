@@ -89,9 +89,17 @@ namespace Base_Asp_Core_MVC_with_Identity.Controllers
         {
             if (!ModelState.IsValid)
             {
-                // nếu lỗi validate thì đổ lại dropdown
-                PopulateDropDowns();
-                return View(empobj);
+                var allErrors = ModelState.Where(kv => kv.Value.Errors.Count > 0)
+                                  .Select(kv => new {
+                                      Field = kv.Key,
+                                      Errors = kv.Value.Errors.Select(e => e.ErrorMessage + " | " + e.Exception?.Message)
+                                  }).ToList();
+
+                // Tạm hiển thị trên View
+                ViewBag.ModelErrors = allErrors;
+
+        PopulateDropDowns();
+        return View(empobj);
             }
 
             var product = new Product

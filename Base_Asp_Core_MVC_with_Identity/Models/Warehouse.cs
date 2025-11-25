@@ -10,6 +10,8 @@ namespace Base_Asp_Core_MVC_with_Identity.Models
 
         [Display(Name = "Sản phẩm")]
         public string ProductId { get; set; }
+        [Display(Name = "Mã lô nhập")]
+        public string? BatchCode { get; set; }
 
         [Required(ErrorMessage = "Số lượng là bắt buộc.")]
         [Display(Name = "Số lượng tồn kho")]
