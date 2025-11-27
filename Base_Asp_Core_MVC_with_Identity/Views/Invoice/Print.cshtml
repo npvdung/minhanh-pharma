@@ -3,6 +3,14 @@
 
 @{
     Layout = null; // Để PDF không dính layout chung
+
+    // Tách tên + SĐT từ field CustomerId = "Tên||SĐT"
+    var customerDisplay = Model.Sales.CustomerId ?? "";
+    var customerName = customerDisplay;
+    var customerPhone = "";
+    var parts = customerDisplay.Split("||");
+    if (parts.Length > 0) { customerName = parts[0]; }
+    if (parts.Length > 1) { customerPhone = parts[1]; }
 }
 
 <!DOCTYPE html>
@@ -41,9 +49,15 @@
         </tr>
         <tr>
             <td class="info-label">Khách hàng:</td>
-            <td>@Model.Sales.CustomerId</td>
+            <td>@customerName</td>
+            <td class="info-label">Số điện thoại:</td>
+            <td>@customerPhone</td>
+        </tr>
+        <tr>
             <td class="info-label">Người bán:</td>
             <td>@Model.Sales.UserId</td>
+            <td></td>
+            <td></td>
         </tr>
         <tr>
             <td class="info-label">Ghi chú:</td>
@@ -78,7 +92,7 @@
         @foreach (var item in Model.salesProductsDetails)
         {
             <tr>
-                <td>@stt++</td>
+                <td>@(stt++)</td>   @* Sửa lại để Razor hiểu đúng, không in "1++" *@
                 <td>@item.ProductId</td>      @* tên + HSD *@
                 <td>@item.ImportId</td>       @* MÃ LÔ *@
                 <td>@item.UnitProductId</td>  @* tên đơn vị *@

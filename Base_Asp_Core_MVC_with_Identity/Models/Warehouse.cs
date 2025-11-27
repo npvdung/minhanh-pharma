@@ -48,7 +48,7 @@ namespace Base_Asp_Core_MVC_with_Identity.Models
         public string? Note { get; set; }
 
         [Display(Name = "Giá trị nhập")]
-        [DisplayFormat(DataFormatString = "{0:C}")]
+        [DisplayFormat(DataFormatString = "{0:N0}")]
         public decimal? TotalValueImport { get; set; }
     }
 

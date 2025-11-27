@@ -368,10 +368,10 @@
                 const importPrice = parseFloat(row.querySelector('input[name$=".ImportPrice"]').value) || 0;
 
                 const totalAmount = quantity * importPrice;
-                row.querySelector('input[name$=".TotalAmount"]').value = totalAmount.toFixed(2);
+                row.querySelector('input[name$=".TotalAmount"]').value = totalAmount.toFixed(0);
                 totalAmountMaster += totalAmount;
             });
-            $('#TotalAmountMaster').val(totalAmountMaster.toFixed(2));
+            $('#TotalAmountMaster').val(totalAmountMaster.toFixed(0));
         }
 
         document.querySelector('#details-table').addEventListener('input', function (e) {

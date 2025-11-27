@@ -34,6 +34,17 @@ namespace Base_Asp_Core_MVC_with_Identity.Controllers
                 var sortColumn = Request.Query["columns[" + Request.Query["order[0][column]"].FirstOrDefault() + "][name]"].FirstOrDefault();
                 var sortDirection = Request.Query["order[0][dir]"].FirstOrDefault();
                 var searchValue = Request.Query["search[value]"].FirstOrDefault();
+                var fromDateStr = Request.Query["fromDate"].FirstOrDefault();
+                var toDateStr = Request.Query["toDate"].FirstOrDefault();
+                DateTime? fromDate = null;
+                DateTime? toDate = null;
+                if (!string.IsNullOrWhiteSpace(fromDateStr) &&
+                    DateTime.TryParse(fromDateStr, out var fd))
+                    fromDate = fd.Date;
+
+                if (!string.IsNullOrWhiteSpace(toDateStr) &&
+                    DateTime.TryParse(toDateStr, out var td))
+                    toDate = td.Date.AddDays(1).AddTicks(-1); // đến cuối ngày
 
                 int pageSize = length != null ? Convert.ToInt32(length) : 10;
                 int skip = start != null ? Convert.ToInt32(start) : 0;
@@ -87,6 +98,12 @@ namespace Base_Asp_Core_MVC_with_Identity.Controllers
                         status = g.Key.Status,
                         approvedValue = (int)EnumApprodImport.approved
                     };
+                
+                if (fromDate.HasValue)
+                    query = query.Where(x => x.importDate >= fromDate.Value);
+
+                if (toDate.HasValue)
+                    query = query.Where(x => x.importDate <= toDate.Value);
 
                 // ---- Search ----
                 if (!string.IsNullOrEmpty(searchValue))

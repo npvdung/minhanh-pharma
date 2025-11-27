@@ -33,6 +33,26 @@ namespace Base_Asp_Core_MVC_with_Identity.Controllers
                 var sortColumnDirection = Request.Query["order[0][dir]"].FirstOrDefault();
                 var searchValue = Request.Query["search[value]"].FirstOrDefault();
 
+                // ====== NHẬN THÊM KHOẢNG NGÀY ======
+                var fromDateStr = Request.Query["fromDate"].FirstOrDefault();
+                var toDateStr = Request.Query["toDate"].FirstOrDefault();
+                DateTime? fromDate = null;
+                DateTime? toDate = null;
+
+                if (!string.IsNullOrWhiteSpace(fromDateStr)
+                    && DateTime.TryParse(fromDateStr, out var fd))
+                {
+                    fromDate = fd.Date;
+                }
+
+                if (!string.IsNullOrWhiteSpace(toDateStr)
+                    && DateTime.TryParse(toDateStr, out var td))
+                {
+                    // đến cuối ngày
+                    toDate = td.Date.AddDays(1).AddTicks(-1);
+                }
+                // ====================================
+
                 int pageSize = length != null ? Convert.ToInt32(length) : 0;
                 int skip = start != null ? Convert.ToInt32(start) : 0;
                 int recordsTotal = 0;
@@ -49,6 +69,18 @@ namespace Base_Asp_Core_MVC_with_Identity.Controllers
                                 exportName = r.ImportId,
                                 r.Reason
                             };
+
+                // ====== LỌC THEO KHOẢNG NGÀY TRẢ HÀNG ======
+                if (fromDate.HasValue)
+                {
+                    query = query.Where(x => x.ReturnDate >= fromDate.Value);
+                }
+
+                if (toDate.HasValue)
+                {
+                    query = query.Where(x => x.ReturnDate <= toDate.Value);
+                }
+                // ===========================================
 
                 // sort
                 if (!string.IsNullOrEmpty(sortColumn) && !string.IsNullOrEmpty(sortColumnDirection))

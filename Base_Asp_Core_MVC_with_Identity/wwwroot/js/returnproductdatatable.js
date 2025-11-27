@@ -1,5 +1,6 @@
 ﻿$(document).ready(function () {
-  $("#customerDatatable").DataTable({
+  // GIỮ LẠI BIẾN TABLE ĐỂ RELOAD
+  var table = $("#customerDatatable").DataTable({
     language: {
       sProcessing: "Đang xử lý...",
       sLengthMenu: "Hiển thị _MENU_ mục",
@@ -29,6 +30,11 @@
       type: "GET",
       datatype: "json",
       dataSrc: "data",
+      // GỬI KÈM KHOẢNG NGÀY LÊN API
+      data: function (d) {
+        d.fromDate = $("#fromDate").val();
+        d.toDate = $("#toDate").val();
+      },
     },
     columnDefs: [
       {
@@ -63,7 +69,7 @@
       },
       { data: "exportName", name: "exportName", autoWidth: true },
 
-      // >>> CỘT MÃ LÔ MỚI
+      // CỘT MÃ LÔ
       {
         data: "batchCode",
         name: "batchCode",
@@ -105,5 +111,15 @@
       [5, 10, 20, 50, 100],
     ],
     pageLength: 5,
+  });
+
+  // ĐẨY CỤM CHỌN NGÀY LÊN CẠNH Ô SEARCH
+  var filter = $("#customerDatatable_filter");
+  filter.css("display", "flex").css("gap", "20px");
+  filter.prepend($("#dateFilterWrapper"));
+
+  // Reload bảng khi đổi ngày
+  $("#fromDate, #toDate").on("change", function () {
+    table.ajax.reload();
   });
 });

@@ -1,17 +1,17 @@
 ﻿$(document).ready(function () {
-  $("#customerDatatable").DataTable({
+  // GIỮ LẠI BIẾN TABLE ĐỂ SAU CÒN RELOAD
+  var table = $("#customerDatatable").DataTable({
     dom: "Bfrtip",
     buttons: [
       {
         extend: "excelHtml5",
-        text: "Xuất báo cáo tổng hợp",
+        text: "Xuất báo cáo",
         title: "Báo cáo nhập hàng",
         exportOptions: {
           // Xuất từ cột STT -> Tổng tiền
           // (0 = ID ẩn, 1 = STT, 2 = Mã nhập, 3 = Mã lô,
           //  4 = Tên thuốc, 5 = Ngày nhập, 6 = Nhà cung cấp, 7 = Tổng tiền)
           columns: [1, 2, 3, 4, 5, 6, 7],
-          // Chuẩn hoá lại dữ liệu khi export (đặc biệt cột Tổng tiền)
           format: {
             body: function (data, row, column, node) {
               // Cột 7 (theo index DataTable) là "totalAmount"
@@ -19,51 +19,36 @@
                 if (data == null) return 0;
 
                 if (typeof data === "string") {
-                  // Trên màn hình đang hiển thị kiểu: "2.500.000 ₫"
-                  // -> bỏ hết ký tự không phải số / , / -
                   data = data
-                    .replace(/[^\d,-]/g, "") // bỏ " ₫" và các ký tự khác
+                    .replace(/[^\d,-]/g, "") // bỏ " ₫" và ký tự khác
                     .replace(/\./g, ""); // bỏ dấu . ngăn cách nghìn
                 }
 
                 var num = parseFloat(data);
                 return isNaN(num) ? 0 : num;
               }
-
               return data;
             },
           },
         },
-        // Sau khi DataTables gom dữ liệu export, ta chèn thêm dòng "Tổng cộng"
         customizeData: function (data) {
-          // Vị trí cột "Tổng tiền"
           var idxTongTien = data.header.indexOf("Tổng tiền");
           var total = 0;
 
-          // Duyệt từng dòng trong body
           data.body.forEach(function (row) {
             var cell = row[idxTongTien] || "";
-
-            // cell hiện đang là chuỗi kiểu: "2.500.000 đ" hoặc "2500000"
-            // => Lọc lấy CHỈ chữ số
             var digits = cell.toString().replace(/[^\d]/g, "");
-
             if (digits) {
-              var value = parseInt(digits, 10); // 2500000
+              var value = parseInt(digits, 10);
               if (!isNaN(value)) {
-                total += value; // Cộng dồn
+                total += value;
               }
             }
           });
 
-          // Tạo một dòng footer cùng số cột với header
           var footerRow = new Array(data.header.length).fill("");
           footerRow[0] = "Tổng cộng";
-
-          // Định dạng tổng tiền: 3820000 => "3.820.000 đ"
           footerRow[idxTongTien] = total.toLocaleString("vi-VN") + " đ";
-
-          // Đẩy dòng footer vào cuối file Excel
           data.body.push(footerRow);
         },
       },
@@ -99,6 +84,11 @@
       type: "GET",
       datatype: "json",
       dataSrc: "data",
+      // GỬI KÈM KHOẢNG NGÀY LÊN API
+      data: function (d) {
+        d.fromDate = $("#fromDate").val();
+        d.toDate = $("#toDate").val();
+      },
     },
 
     columnDefs: [
@@ -124,16 +114,10 @@
         },
       },
 
-      // Mã nhập hàng
       { data: "importCode", name: "importCode", autoWidth: true },
-
-      // Mã lô (bạn đang trả ra từ API)
       { data: "batchCode", name: "batchCode", autoWidth: true },
-
-      // Tên thuốc
       { data: "productName", name: "productName", autoWidth: true },
 
-      // Ngày nhập
       {
         data: "importDate",
         name: "importDate",
@@ -146,10 +130,8 @@
         },
       },
 
-      // Nhà cung cấp
       { data: "supplierName", name: "supplierName", autoWidth: true },
 
-      // Tổng tiền
       {
         data: "totalAmount",
         name: "totalAmount",
@@ -164,7 +146,6 @@
         },
       },
 
-      // Nút "Xem"
       {
         data: null,
         width: "50px",
@@ -179,7 +160,6 @@
         },
       },
 
-      // Nút phê duyệt
       {
         data: null,
         width: "110px",
@@ -207,6 +187,16 @@
       [5, 10, 20, 50, 100],
     ],
     pageLength: 5,
+  });
+
+  // Đẩy cụm chọn ngày lên cạnh ô Search
+  var filter = $("#customerDatatable_filter");
+  filter.css("display", "flex").css("gap", "20px");
+  filter.prepend($("#dateFilterWrapper"));
+
+  // 🔁 Reload bảng khi thay đổi ngày
+  $("#fromDate, #toDate").on("change", function () {
+    table.ajax.reload();
   });
 });
 

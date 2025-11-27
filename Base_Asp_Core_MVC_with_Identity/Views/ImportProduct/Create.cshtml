@@ -373,12 +373,12 @@
                 const price = parseFloat($row2.find('input[name$=".ImportPrice"]').val()) || 0;
 
                 const lineTotal = qty * price;
-                $row2.find('input[name$=".TotalAmount"]').val(lineTotal.toFixed(2));
+                $row2.find('input[name$=".TotalAmount"]').val(lineTotal.toFixed(0));
 
                 totalAmountMaster += lineTotal;
             });
 
-            $('#TotalAmountMaster').val(totalAmountMaster.toFixed(2));
+            $('#TotalAmountMaster').val(totalAmountMaster.toFixed(0));
         }
 
         // ----- Khi nhập Số lượng / Giá nhập -----

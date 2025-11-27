@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Base_Asp_Core_MVC_with_Identity.Models
 {
@@ -26,6 +27,7 @@ namespace Base_Asp_Core_MVC_with_Identity.Models
         [Display(Name = "Ghi chú")]
         public string? Description { get; set; }
 
+        [Column(TypeName = "decimal(18,0)")]
         [Display(Name = "Tổng tiền hủy")]
         public decimal? TotalAmount { get; set; }
 

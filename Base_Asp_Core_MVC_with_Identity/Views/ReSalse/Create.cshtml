@@ -326,12 +326,12 @@
             const price = parseFloat(row.querySelector('input[name$=".Price"]').value) || 0;
 
             const totalAmount = quantity * price;
-            row.querySelector('input[name$=".TotalAmount"]').value = totalAmount.toFixed(2);
+            row.querySelector('input[name$=".TotalAmount"]').value = totalAmount.toFixed(0);
 
             totalAmountMaster += totalAmount;
         });
 
-        $('#TotalAmountMaster').val(totalAmountMaster.toFixed(2));
+        $('#TotalAmountMaster').val(totalAmountMaster.toFixed(0));
     }
 
     document.querySelector('#details-table').addEventListener('input', function (e) {
@@ -484,11 +484,11 @@
                 const q = parseFloat(qtyInput.value) || 0;
                 const p = parseFloat(priceInput.value) || 0;
                 const total = q * p;
-                totalInput.value = total.toFixed(2);
+                totalInput.value = total.toFixed(0);
                 totalAmountMaster += total;
             }
 
-            $('#TotalAmountMaster').val(totalAmountMaster.toFixed(2));
+            $('#TotalAmountMaster').val(totalAmountMaster.toFixed(0));
 
             $('.product-select').select2({ width: '100%' });
             $('.unit-select').select2({ width: '100%' });

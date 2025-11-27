@@ -1,5 +1,7 @@
 ﻿using MessagePack;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+
 
 namespace Base_Asp_Core_MVC_with_Identity.Models
 {
@@ -18,12 +20,14 @@ namespace Base_Asp_Core_MVC_with_Identity.Models
         [Display(Name = "Tỷ lệ quy đổi (so với đơn vị nhỏ nhất)")]
         public int? Rate { get; set; }
 
+        [Column(TypeName = "decimal(18,0)")]
         [Display(Name = "Giá nhập")]
         public decimal? PriceBuy { get; set; }
 
         [Display(Name = "Quy cách đóng gói")]
         public string? Contain { get; set; }
 
+        [Column(TypeName = "decimal(18,0)")]
         [Display(Name = "Giá bán")]
         public decimal? PriceSell { get; set; }
     }

@@ -332,12 +332,12 @@
 
                 // Tính thành tiền
                 const totalAmount = quantity * importPrice;
-                row.querySelector('input[name$=".TotalAmount"]').value = totalAmount.toFixed(2);
+                row.querySelector('input[name$=".TotalAmount"]').value = totalAmount.toFixed(0);
 
                 // Cộng dồn vào tổng tiền master
                 totalAmountMaster += totalAmount;
             });
-            $('#TotalAmountMaster').val(totalAmountMaster.toFixed(2));
+            $('#TotalAmountMaster').val(totalAmountMaster.toFixed(0));
             // Cập nhật tổng tiền master
         }
 

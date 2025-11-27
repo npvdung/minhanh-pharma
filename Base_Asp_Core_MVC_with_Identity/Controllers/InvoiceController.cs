@@ -243,10 +243,19 @@ namespace Base_Asp_Core_MVC_with_Identity.Controllers
                             .Select(u => u.FirstName + " " + u.LastName)
                             .FirstOrDefault() ?? "";
 
-            var customerName = _context.Customers
-                                .Where(c => c.ID.ToString() == invoice.CustomerId)
-                                .Select(c => c.FullName)
-                                .FirstOrDefault() ?? "";
+            // Lấy cả tên + SĐT khách hàng
+            var customer = _context.Customers
+                                   .FirstOrDefault(c => c.ID.ToString() == invoice.CustomerId);
+
+            var customerName = customer?.FullName ?? "";
+            var customerPhone = customer?.PhoneNumber ?? "";
+
+            // Ghép vào một field, sau đó tách ở View (để không sửa model)
+            var customerDisplay = customerName;
+            if (!string.IsNullOrEmpty(customerPhone))
+            {
+                customerDisplay = customerName + "||" + customerPhone;
+            }
 
             viewModel.Sales = new Sales
             {
@@ -254,9 +263,9 @@ namespace Base_Asp_Core_MVC_with_Identity.Controllers
                 Description = invoice.Description,
                 InvoiceDate = invoice.InvoiceDate,
                 TotalAmount = invoice.TotalAmount,
-                // dùng tạm 2 field này để chứa tên hiển thị
-                UserId = sellerName,
-                CustomerId = customerName
+                // dùng tạm 2 field này để chứa thông tin hiển thị
+                UserId = sellerName,          // tên người bán
+                CustomerId = customerDisplay  // "Tên||SĐT" để view tách ra
             };
 
             // ----- Chi tiết + hiển thị MÃ LÔ -----
@@ -305,7 +314,6 @@ namespace Base_Asp_Core_MVC_with_Identity.Controllers
                 PageOrientation = Rotativa.AspNetCore.Options.Orientation.Portrait
             };
         }
-
         // ========================= EDIT - GET =========================
         [Authorize(Roles = "Admin, Employee")]
         public IActionResult Edit(Guid Id)

@@ -29,12 +29,15 @@ namespace Base_Asp_Core_MVC_with_Identity.Models
         [Display(Name = "Số lượng hủy")]
         public int? Quantity { get; set; }
 
+        [Column(TypeName = "decimal(18,0)")]
         [Display(Name = "Đơn giá")]
         public decimal? Price { get; set; }
 
+        [Column(TypeName = "decimal(18,0)")]
         [Display(Name = "Giá nhập (nếu dùng)")]
         public decimal? ImportPrice { get; set; }
 
+        [Column(TypeName = "decimal(18,0)")]
         [Display(Name = "Thành tiền")]
         public decimal? TotalAmount { get; set; }
 

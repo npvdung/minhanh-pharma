@@ -318,13 +318,13 @@
                 const totalAmount = quantity * rate * price;
                 const totalInput = row.querySelector('input[name$=".TotalAmount"]');
                 if (totalInput) {
-                    totalInput.value = totalAmount.toFixed(2);
+                    totalInput.value = totalAmount.toFixed(0);
                 }
 
                 totalAmountMaster += totalAmount;
             });
 
-            $('#TotalAmountMaster').val(totalAmountMaster.toFixed(2));
+            $('#TotalAmountMaster').val(totalAmountMaster.toFixed(0));
         }
 
         // Tự động tính lại khi nhập Quantity / Description (tỉ lệ) / Price

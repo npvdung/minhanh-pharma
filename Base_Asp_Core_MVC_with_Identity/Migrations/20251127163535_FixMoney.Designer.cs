@@ -3,6 +3,7 @@ using System;
 using Base_Asp_Core_MVC_with_Identity.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Base_Asp_Core_MVC_with_Identity.Migrations
 {
     [DbContext(typeof(Base_Asp_Core_MVC_with_IdentityContext))]
-    partial class Base_Asp_Core_MVC_with_IdentityContextModelSnapshot : ModelSnapshot
+    [Migration("20251127163535_FixMoney")]
+    partial class FixMoney
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -42,7 +44,7 @@ namespace Base_Asp_Core_MVC_with_Identity.Migrations
                     b.Property<DateTime?>("DateOfBirth")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime(6)")
-                        .HasDefaultValue(new DateTime(2025, 11, 28, 0, 11, 51, 678, DateTimeKind.Local).AddTicks(2070));
+                        .HasDefaultValue(new DateTime(2025, 11, 27, 23, 35, 35, 679, DateTimeKind.Local).AddTicks(8450));
 
                     b.Property<string>("Email")
                         .HasMaxLength(256)

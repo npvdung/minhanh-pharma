@@ -21,8 +21,11 @@ namespace Base_Asp_Core_MVC_with_Identity.Models
         [Required]
         public int? Quantity { get; set; }
         [NotMapped]
+        [Column(TypeName = "decimal(18,0)")]
         public decimal? Price { get; set; }
+        [Column(TypeName = "decimal(18,0)")]
         public decimal? ImportPrice { get; set; }
+        [Column(TypeName = "decimal(18,0)")]
         public decimal? TotalAmount { get; set; }
         public string? BatchCode { get; set; }
         public string? UnitProductId { get; set; }

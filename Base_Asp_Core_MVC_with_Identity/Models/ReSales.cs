@@ -1,4 +1,5 @@
-﻿namespace Base_Asp_Core_MVC_with_Identity.Models
+﻿using System.ComponentModel.DataAnnotations.Schema;
+namespace Base_Asp_Core_MVC_with_Identity.Models
 {
     public class ReSales
     {
@@ -20,9 +21,10 @@
         [Display(Name = "Lý do trả hàng")]
         public string? Reason { get; set; }
 
-        [Display(Name = "Ngày trả hàng")]
+        [Display(Name = "Ngày xuất kho")]
         public DateTime? InvoiceDate { get; set; }
 
+        [Column(TypeName = "decimal(18,0)")]
         [Display(Name = "Tổng tiền trả lại")]
         public decimal? TotalAmount { get; set; }
 

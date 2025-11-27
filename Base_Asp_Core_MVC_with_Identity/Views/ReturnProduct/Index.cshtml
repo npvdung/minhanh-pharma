@@ -25,13 +25,23 @@
 </div>
 
 <div class="table-responsive table-section">
+
+    <!-- BỘ LỌC NGÀY XUẤT KHO -->
+    <div id="dateFilterWrapper"
+         style="display:flex; gap:10px; margin-bottom:10px; align-items:center;">
+        <label>Từ ngày:</label>
+        <input type="date" id="fromDate" class="form-control form-control-sm" style="max-width:150px;" />
+        <label>Đến ngày:</label>
+        <input type="date" id="toDate" class="form-control form-control-sm" style="max-width:150px;" />
+    </div>
+
     <table id="customerDatatable" class="table table-bordered table-hover custom-table" cellspacing="0" width="100%">
         <thead class="table-header text-white bg-cam">
             <tr>
                 <th>ID</th>
                 <th>STT</th>
-                <th>Ngày trả hàng</th>
-                <th>Mã trả hàng</th>
+                <th>Ngày xuất kho</th>
+                <th>Mã xuất kho</th>
                 <th>Mã lô</th>
                 <th>Lí do</th>
                 <th>Tổng tiền</th>

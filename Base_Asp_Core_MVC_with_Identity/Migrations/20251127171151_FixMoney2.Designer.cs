@@ -3,6 +3,7 @@ using System;
 using Base_Asp_Core_MVC_with_Identity.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Base_Asp_Core_MVC_with_Identity.Migrations
 {
     [DbContext(typeof(Base_Asp_Core_MVC_with_IdentityContext))]
-    partial class Base_Asp_Core_MVC_with_IdentityContextModelSnapshot : ModelSnapshot
+    [Migration("20251127171151_FixMoney2")]
+    partial class FixMoney2
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

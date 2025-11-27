@@ -311,7 +311,7 @@
                 const lineTotal = quantity * price;
 
                 if (totalInput) {
-                    totalInput.value = lineTotal.toFixed(2);
+                    totalInput.value = lineTotal.toFixed(0);
                 }
 
                 totalAmountMaster += lineTotal;
@@ -319,7 +319,7 @@
 
             const masterInput = document.getElementById('TotalAmountMaster');
             if (masterInput) {
-                masterInput.value = totalAmountMaster.toFixed(2);
+                masterInput.value = totalAmountMaster.toFixed(0);
             }
         }
 
