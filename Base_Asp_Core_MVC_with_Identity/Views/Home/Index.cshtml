@@ -161,7 +161,23 @@
 </div>
 
 <div class="table-section">
-    <h4>Chi tiết sản phẩm sắp hết hạn</h4>
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+        <h4>Chi tiết sản phẩm sắp hết hạn</h4>
+
+        <!-- Filter khoảng thời gian -->
+        <form asp-controller="Home" asp-action="Index" method="get" id="expiry-filter-form"
+              style="display:flex; align-items:center; gap:8px;">
+            <label for="expiryRange" style="margin:0;">Khoảng thời gian:</label>
+            <select id="expiryRange" name="range" class="form-control"
+                    onchange="document.getElementById('expiry-filter-form').submit();">
+                <option value="7">1 tuần tới</option>
+                <option value="30">1 tháng tới</option>
+                <option value="90">3 tháng tới</option>
+                <option value="180">6 tháng tới</option>
+            </select>
+        </form>
+    </div>
+
     <div class="table-responsive">
         <table class="product-table">
             <thead>
@@ -177,13 +193,15 @@
                     <tr>
                         <td>@item.ProductName</td>
                         <td>@item.QuantitySold</td>
-                        <td>@item.ExpirationDate.Value.ToString("dd/MM/yyyy")</td>
+                        <td>@item.ExpirationDate?.ToString("dd/MM/yyyy")</td>
                     </tr>
                 }
             </tbody>
         </table>
     </div>
 </div>
+
+
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
@@ -242,5 +260,16 @@
             }
         }
     });
+    (function () {
+            var currentRange = @Model.ExpiryRangeDays;   // 7, 30, 90, 180
+            var sel = document.getElementById('expiryRange');
+            if (!sel) return;
 
+            for (var i = 0; i < sel.options.length; i++) {
+                if (parseInt(sel.options[i].value) === currentRange) {
+                    sel.selectedIndex = i;
+                    break;
+                }
+            }
+        })();
 </script>

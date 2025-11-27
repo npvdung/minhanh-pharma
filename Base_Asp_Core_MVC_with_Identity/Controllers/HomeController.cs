@@ -18,7 +18,7 @@ namespace Base_Asp_Core_MVC_with_Identity.Controllers
             _context = context;
         }
 
-        public IActionResult Index()
+        public IActionResult Index(int range = 7)
         {
 
             var totalAmount = _context.Invoices
@@ -46,39 +46,75 @@ namespace Base_Asp_Core_MVC_with_Identity.Controllers
                     .Distinct()
                     .Count()
             ).ToList();
-            var productDetails = (from tempdata in _context.stocks
-                                  join tempProduct in _context.Products on tempdata.ProductId equals tempProduct.ID.ToString() into tempTable1
-                                  from tb1 in tempTable1.DefaultIfEmpty()
-                                  join tempSupplier in _context.suppliers on tb1.SupplierId equals tempSupplier.ID.ToString() into tempTable2
-                                  from tb2 in tempTable2.DefaultIfEmpty()
-                                  orderby tempdata.ExpirationData ascending // Sắp xếp gần nhất
-                                  select new ProductDetailViewModel
-                                  {
-                                      ProductId = tempdata.ID.ToString(),
-                                      ProductName = tb1.ProductName,
-                                      QuantitySold = tempdata.QuantityInStock, // Nếu đây là trường cần hiển thị
-                                      ExpirationDate = tempdata.ExpirationData, // Ngày hết hạn
-                                  })
-                     .Where(x => x.QuantitySold > 0)
-                     .Take(10) // Lấy 10 bản ghi
-                     .ToList();
-            var viewModel = new DashboardViewModel
+                // ====== LỌC SẢN PHẨM SẮP HẾT HẠN THEO KHOẢNG THỜI GIAN ======
+            var today = DateTime.Today;
+
+            // Chuẩn hóa khoảng thời gian (ngày) từ query
+            // 7: 1 tuần, 30: 1 tháng, 90: 3 tháng, 180: 6 tháng
+            int expiryRangeDays;
+            DateTime endDate;
+
+            switch (range)
             {
-                // Thống kê
-                TotalCustomers = _context.Customers.Count(),
-                Revenue = totalAmount - totalReSale,
-                ProductsSold = _context.Invoice_Details.Select(x => x.ProductId).Count(),
-                OrdersCompleted = _context.Invoices.Count().ToString(),
+                case 30:
+                    expiryRangeDays = 30;
+                    endDate = today.AddMonths(1);
+                    break;
+                case 90:
+                    expiryRangeDays = 90;
+                    endDate = today.AddMonths(3);
+                    break;
+                case 180:
+                    expiryRangeDays = 180;
+                    endDate = today.AddMonths(6);
+                    break;
+                case 7:
+                default:
+                    expiryRangeDays = 7;
+                    endDate = today.AddDays(7);
+                    break;
+            }
 
-                RevenueChartData = revenueChartData,
-                UserChartData = userChartData,
-                ChartLabels = months.Select(m => m.MonthName).ToList(),
+            var productDetails = (from tempdata in _context.stocks
+                                join tempProduct in _context.Products on tempdata.ProductId equals tempProduct.ID.ToString() into tempTable1
+                                from tb1 in tempTable1.DefaultIfEmpty()
+                                join tempSupplier in _context.suppliers on tb1.SupplierId equals tempSupplier.ID.ToString() into tempTable2
+                                from tb2 in tempTable2.DefaultIfEmpty()
+                                where tempdata.ExpirationData.HasValue
+                                        && tempdata.ExpirationData.Value.Date >= today
+                                        && tempdata.ExpirationData.Value.Date <= endDate
+                                        && tempdata.QuantityInStock > 0
+                                orderby tempdata.ExpirationData ascending
+                                select new ProductDetailViewModel
+                                {
+                                    ProductId = tempdata.ID.ToString(),
+                                    ProductName = tb1.ProductName,
+                                    QuantitySold = tempdata.QuantityInStock,
+                                    ExpirationDate = tempdata.ExpirationData
+                                })
+                                .ToList();
 
-                // Dữ liệu bảng
-                ProductDetails = productDetails,
-            };
+                var viewModel = new DashboardViewModel
+                {
+                    // Thống kê
+                    TotalCustomers = _context.Customers.Count(),
+                    Revenue = totalAmount - totalReSale,
+                    ProductsSold = _context.Invoice_Details.Select(x => x.ProductId).Count(),
+                    OrdersCompleted = _context.Invoices.Count().ToString(),
 
-            return View(viewModel);
+                    RevenueChartData = revenueChartData,
+                    UserChartData = userChartData,
+                    ChartLabels = months.Select(m => m.MonthName).ToList(),
+
+                    // Dữ liệu bảng
+                    ProductDetails = productDetails,
+
+                    // NEW: lưu khoảng thời gian đang chọn
+                    ExpiryRangeDays = expiryRangeDays
+                };
+
+                return View(viewModel);
+
     }
 
     public IActionResult Privacy()

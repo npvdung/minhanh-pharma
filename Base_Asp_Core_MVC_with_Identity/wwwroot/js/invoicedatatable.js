@@ -1,5 +1,5 @@
 ﻿$(document).ready(function () {
-  $("#customerDatatable").DataTable({
+  var table = $("#customerDatatable").DataTable({
     dom: "Bfrtip",
     buttons: [
       {
@@ -44,7 +44,7 @@
       sInfo: "Hiển thị từ _START_ đến _END_ của _TOTAL_ mục",
       sInfoEmpty: "Hiển thị từ 0 đến 0 của 0 mục",
       sInfoFiltered: "(đã lọc từ _MAX_ mục)",
-      sSearch: "Tìm kiếm:",
+      sSearch: "Tìm kiếm theo tên khách hàng:",
       oPaginate: {
         sFirst: "Đầu",
         sPrevious: "Trước",
@@ -60,6 +60,11 @@
       type: "GET",
       datatype: "json",
       dataSrc: "data",
+      // Gửi thêm 2 tham số fromDate & toDate lên API
+      data: function (d) {
+        d.fromDate = $("#fromDate").val();
+        d.toDate = $("#toDate").val();
+      },
     },
     columnDefs: [
       {
@@ -102,11 +107,11 @@
         data: null,
         render: function (data, type, row) {
           return `
-                        <a href="/Invoice/Print/${row.id}" 
-                           class="btn btn-outline-secondary m-1"
-                           title="In hóa đơn">
-                            <i class="fa fa-print"></i>
-                        </a>`;
+              <a href="/Invoice/Print/${row.id}" 
+                 class="btn btn-outline-secondary m-1"
+                 title="In hóa đơn">
+                  <i class="fa fa-print"></i>
+              </a>`;
         },
       },
 
@@ -124,5 +129,20 @@
       [5, 10, 20, 50, 100],
     ],
     pageLength: 5,
+  });
+
+  // Đưa khung lọc ngày vào cùng dòng với ô search của DataTables
+  var filterContainer = $("#customerDatatable_filter");
+  if (filterContainer.length && $("#dateFilterWrapper").length) {
+    filterContainer.prepend($("#dateFilterWrapper"));
+    // thêm chút khoảng cách với label search
+    filterContainer.css("display", "flex");
+    filterContainer.css("gap", "12px");
+    filterContainer.find("label").css("margin-bottom", "0");
+  }
+
+  // Khi đổi khoảng ngày → reload lại bảng
+  $("#fromDate, #toDate").on("change", function () {
+    table.ajax.reload();
   });
 });

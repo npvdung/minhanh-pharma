@@ -4,6 +4,7 @@
 <link rel="stylesheet" href="node_modules/antd/dist/antd.css">
 <link href="~/css/datatable.css" rel="stylesheet" />
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+
 @if (TempData["ResultOk"] != null)
 {
     <div id="alert-div" class="alert alert-success position-fixed top-0 end-0 border border-success rounded-pill py-2 px-3" style="max-width: 450px;">
@@ -18,31 +19,49 @@
         }, 3000);
     </script>
 }
+
 <div class="header-section d-flex justify-content-between align-items-center my-3">
     <h2 class="text-cam fw-bold">Danh sách hóa đơn bán hàng</h2>
     <a asp-controller="Invoice" asp-action="Create" class="btn btn-cam"> Thêm Hóa đơn</a>
 </div>
 
 <div class="table-responsive table-section">
-    <table id="customerDatatable" class="table table-bordered table-hover custom-table" cellspacing="0" width="100%" 
-       data-show-export="true">
+
+    <!-- Bộ lọc ngày tạo hóa đơn (sẽ được JS di chuyển vào thanh search của DataTables) -->
+    <div id="dateFilterWrapper"
+         style="display:flex; align-items:center; gap:8px; margin-bottom:8px;">
+        <label for="fromDate" style="margin:0;">Từ ngày:</label>
+        <input type="date" id="fromDate"
+               class="form-control form-control-sm"
+               style="max-width:160px;" />
+        <label for="toDate" style="margin:0;">Đến ngày:</label>
+        <input type="date" id="toDate"
+               class="form-control form-control-sm"
+               style="max-width:160px;" />
+    </div>
+
+    <table id="customerDatatable"
+           class="table table-bordered table-hover custom-table"
+           cellspacing="0"
+           width="100%"
+           data-show-export="true">
         <thead class="table-header text-white bg-cam">
             <tr>
-                    <th>ID</th>
-                    <th>STT</th>
-                    <th>Mã hoá đơn</th>
-                    <th>Ngày tạo</th>
-                    <th>Khách hàng</th>
-                    <th>Tổng tiền</th>
-                    <th>In hoá đơn</th>
-                    <th></th>
-                    @*<th></th>*@
-                </tr>
-            </thead>
-        </table>
-    </div>
+                <th>ID</th>
+                <th>STT</th>
+                <th>Mã hoá đơn</th>
+                <th>Ngày tạo</th>
+                <th>Khách hàng</th>
+                <th>Tổng tiền</th>
+                <th>In hoá đơn</th>
+                <th></th>
+            </tr>
+        </thead>
+    </table>
+</div>
+
 @section Scripts
-    {
+{
     <script src="~/lib/datatables/js/jquery.dataTables.min.js"></script>
     <script src="~/lib/datatables/js/dataTables.bootstrap4.min.js"></script>
     <script src="~/js/invoicedatatable.js"></script>

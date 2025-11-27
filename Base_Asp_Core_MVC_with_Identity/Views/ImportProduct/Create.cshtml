@@ -264,12 +264,12 @@
                     <option value="@item.Value">@item.Text</option>
                 }
             </select>
-            <select id="unit-template" style="display: none;">
+            @* <select id="unit-template" style="display: none;">
                 @foreach (var item in unitList)
                 {
                     <option value="@item.Value">@item.Text</option>
                 }
-            </select>
+            </select> *@
 
             <!-- DETAILS 2 HÀNG / 1 ITEM -->
             <h3 class="form-title">Chi tiết sản phẩm</h3>
@@ -308,7 +308,9 @@
     <partial name="_ValidationScriptsPartial" />
 
     <script>
-        // ----------------- Helper: bỏ dấu + sinh slug -----------------
+        console.log(">>> ImportProduct Create script loaded");
+
+        // ----- Helper: bỏ dấu + sinh slug -----
         function slugify(text) {
             return text
                 .toString()
@@ -318,152 +320,188 @@
                 .replace(/^-+|-+$/g, '');
         }
 
-        // Lấy 2 <tr> của 1 item theo index
+        // ----- Lấy 2 <tr> của 1 item theo index -----
         function getRowPair(index) {
             const row1 = document.querySelector('#details-table tbody tr.detail-row[data-index="' + index + '"]');
             const row2 = document.querySelector('#details-table tbody tr.detail-row-2[data-index="' + index + '"]');
             return { row1, row2 };
         }
 
-        // ----------------- Sinh BatchCode cho 1 item -----------------
+        // ----- Sinh BatchCode cho 1 item (theo Tên SP + NSX + HSD) -----
         function generateBatchCode(index) {
-            const rows = getRowPair(index);
-            if (!rows.row1 || !rows.row2) return;
+        const rows = getRowPair(index);
+        if (!rows.row1 || !rows.row2) return;
 
-            const productSelect     = rows.row1.querySelector('select[name$=".ProduceId"]');
-            const manufacturingInput = rows.row1.querySelector('input[name$=".ManufacturingDate"]');
-            const importDateInput    = document.querySelector('input[name="ImportMaster.ImportDate"]');
-            const batchCodeInput     = rows.row2.querySelector('input[name$=".BatchCode"]');
+        const productSelect      = rows.row1.querySelector('select[name$=".ProduceId"]');
+        const manufacturingInput = rows.row1.querySelector('input[name$=".ManufacturingDate"]');
+        const expirationInput    = rows.row1.querySelector('input[name$=".ExpirationData"]');
+        const batchCodeInput     = rows.row2.querySelector('input[name$=".BatchCode"]');
 
-            if (!productSelect || !manufacturingInput || !importDateInput || !batchCodeInput) return;
+        if (!productSelect || !manufacturingInput || !expirationInput || !batchCodeInput) return;
 
-            const selectedText = productSelect.options[productSelect.selectedIndex]?.text || "";
-            const productName  = (selectedText.split(' - ')[0] || selectedText).trim();
+        const selectedText = productSelect.options[productSelect.selectedIndex]?.text || "";
+        const productName  = (selectedText.split(' - ')[0] || selectedText).trim();
 
-            const mDate = manufacturingInput.value;
-            const iDate = importDateInput.value;
+        const mDate = manufacturingInput.value;   // Ngày sản xuất
+        const eDate = expirationInput.value;      // Ngày hết hạn
 
-            if (!productName || !mDate || !iDate) {
-                batchCodeInput.value = "";
-                return;
-            }
-
-            const slugName = slugify(productName);
-            const mDateStr = mDate.replace(/-/g, '');
-            const iDateStr = iDate.replace(/-/g, '');
-
-            const code = `${slugName}-${mDateStr}-${iDateStr}-${(index + 1).toString().padStart(2, '0')}`;
-            batchCodeInput.value = code;
+        // Thiếu 1 trong 3 thông tin thì không sinh mã
+        if (!productName || !mDate || !eDate) {
+            batchCodeInput.value = "";
+            return;
         }
 
-        // ----------------- Tính tiền & tổng tiền master -----------------
+        const slugName = slugify(productName);
+        const mDateStr = mDate.replace(/-/g, '');
+        const eDateStr = eDate.replace(/-/g, '');
+
+        // Ví dụ: panadol-20251112-20251120-01
+        const code = `${slugName}-${mDateStr}-${eDateStr}-${(index + 1)
+            .toString()
+            .padStart(2, '0')}`;
+
+        batchCodeInput.value = code;
+        }
+
+        // ----- Tính tiền & tổng tiền master -----
         function updateAmounts() {
             let totalAmountMaster = 0;
 
-            document.querySelectorAll('#details-table tbody tr.detail-row-2').forEach(row2 => {
-                const qtyInput   = row2.querySelector('input[name$=".Quantity"]');
-                const priceInput = row2.querySelector('input[name$=".ImportPrice"]');
-                const totalInput = row2.querySelector('input[name$=".TotalAmount"]');
+            $('#details-table tbody tr.detail-row-2').each(function () {
+                const $row2 = $(this);
+                const qty   = parseFloat($row2.find('input[name$=".Quantity"]').val())     || 0;
+                const price = parseFloat($row2.find('input[name$=".ImportPrice"]').val()) || 0;
 
-                const quantity   = parseFloat(qtyInput?.value)   || 0;
-                const importPrice = parseFloat(priceInput?.value) || 0;
+                const lineTotal = qty * price;
+                $row2.find('input[name$=".TotalAmount"]').val(lineTotal.toFixed(2));
 
-                const total = quantity * importPrice;
-                if (totalInput) {
-                    totalInput.value = total.toFixed(2);
-                }
-
-                totalAmountMaster += total;
+                totalAmountMaster += lineTotal;
             });
 
             $('#TotalAmountMaster').val(totalAmountMaster.toFixed(2));
         }
 
-        // ----------------- Event trên bảng chi tiết -----------------
-        const detailsTable = document.querySelector('#details-table');
-
-        // input: Quantity, ImportPrice, ManufacturingDate
-        detailsTable.addEventListener('input', function (e) {
-            const tr = e.target.closest('tr');
-            if (!tr) return;
-            const index = tr.dataset.index;
-
-            if (e.target.name.includes('.Quantity') || e.target.name.includes('.ImportPrice')) {
-                updateAmounts();
-            }
-
-            if (e.target.name.includes('.ManufacturingDate')) {
-                generateBatchCode(parseInt(index));
-            }
+        // ----- Khi nhập Số lượng / Giá nhập -----
+        $('#details-table').on('input', 'input[name$=".Quantity"], input[name$=".ImportPrice"]', function () {
+            updateAmounts();
         });
 
-        // change: chọn Product hoặc Unit
-        detailsTable.addEventListener('change', async function (e) {
-            const tr = e.target.closest('tr');
-            if (!tr) return;
-            const index = parseInt(tr.dataset.index);
-            const rows = getRowPair(index);
+        // ----- Khi chọn SẢN PHẨM hoặc ĐƠN VỊ (giống ReturnProduct) -----
+        $('#details-table').on('change', 'select', async function (e) {
+            const target = e.target;
 
-            // Chọn sản phẩm
-            if (e.target.name.includes('.ProduceId')) {
+            // chỉ xử lý các select trong ProductDetails
+            if (!target.name || !target.name.startsWith("ProductDetails[")) return;
+
+            const row1 = target.closest('tr.detail-row');
+            if (!row1) return;
+
+            const index = parseInt(row1.dataset.index);
+            const rows  = getRowPair(index);
+
+            // ===== Khi chọn sản phẩm =====
+            if (target.name.includes('.ProduceId')) {
+                const productId = target.value;
+                console.log(">>> chọn sản phẩm, productId =", productId);
+
+                // sinh mã lô (nếu đã có ngày SX + ngày nhập)
                 generateBatchCode(index);
 
-                const productId = e.target.value;
-                if (productId) {
+                if (!productId) return;
+
+                try {
                     const response = await fetch(`/api/ImportProductApi/GetUnits/${productId}`);
-                    if (response.ok) {
-                        const units = await response.json();
-                        const unitSelect = rows.row1.querySelector('select[name$=".UnitProductId"]');
-                        if (!unitSelect) return;
+                    console.log("GetUnits status:", response.status);
 
-                        unitSelect.innerHTML = '<option value="">Select Unit</option>';
-                        units.forEach(unit => {
-                            const option = document.createElement('option');
-                            option.value = unit.value || '';
-                            option.textContent = unit.text || '';
-                            unitSelect.appendChild(option);
-                        });
-
-                        $(unitSelect).select2({
-                            placeholder: "Select Unit",
-                            allowClear: true,
-                            width: '100%'
-                        });
+                    if (!response.ok) {
+                        console.error("GetUnits lỗi:", response.status);
+                        return;
                     }
-                }
-            }
 
-            // Chọn đơn vị -> lấy ConvertRate
-            if (e.target.name.includes('.UnitProductId')) {
-                const unitId = e.target.value;
-                if (unitId) {
-                    const response = await fetch(`/api/ImportProductApi/GetUnitDetails/${unitId}`);
-                    if (response.ok) {
-                        const details = await response.json();
-                        rows.row1.querySelector('input[name$=".ConvertRate"]').value = details.rate || '';
-                        const row2 = rows.row2;
-                        row2.querySelector('input[name$=".Quantity"]').value = 1;
-                        updateAmounts();
-                    }
-                }
-            }
-        });
+                    const units = await response.json();
+                    console.log("Units from API:", units);
 
-        // Thay đổi ngày nhập -> sinh lại BatchCode cho tất cả dòng
-        document.addEventListener('DOMContentLoaded', function () {
-            const importDateInput = document.querySelector('input[name="ImportMaster.ImportDate"]');
-            if (importDateInput) {
-                importDateInput.addEventListener('change', function () {
-                    document.querySelectorAll('#details-table tbody tr.detail-row').forEach(row1 => {
-                        const index = parseInt(row1.dataset.index);
-                        generateBatchCode(index);
+                    const unitSelect = rows.row1.querySelector('select[name$=".UnitProductId"]');
+                    if (!unitSelect) return;
+
+                    unitSelect.innerHTML = '<option value="">-- Chọn đơn vị --</option>';
+                    units.forEach(u => {
+                        const opt = document.createElement('option');
+                        opt.value = u.value || u.Value;
+                        opt.textContent = u.text || u.Text;
+                        unitSelect.appendChild(opt);
                     });
-                });
+
+                    $(unitSelect).select2({
+                        placeholder: "Chọn đơn vị",
+                        allowClear: true,
+                        width: '100%'
+                    });
+
+                    // auto chọn đơn vị đầu tiên nếu có
+                    if (units.length > 0) {
+                        unitSelect.value = units[0].value || units[0].Value;
+                        $(unitSelect).trigger('change');
+                    }
+                } catch (err) {
+                    console.error("Lỗi fetch GetUnits:", err);
+                }
+            }
+
+            // ===== Khi chọn ĐƠN VỊ =====
+            if (target.name.includes('.UnitProductId')) {
+                const unitId = target.value;
+                console.log(">>> chọn đơn vị, unitId =", unitId);
+
+                if (!unitId) return;
+
+                try {
+                    const response = await fetch(`/api/ImportProductApi/GetUnitDetails/${unitId}`);
+                    console.log("GetUnitDetails status:", response.status);
+
+                    if (!response.ok) {
+                        console.error("GetUnitDetails lỗi:", response.status);
+                        return;
+                    }
+
+                    const u = await response.json();
+                    console.log("Unit details:", u);
+
+                    // Tỉ lệ
+                    rows.row1.querySelector('input[name$=".ConvertRate"]').value = u.rate || u.Rate || 1;
+                    // Auto số lượng = 1
+                    rows.row2.querySelector('input[name$=".Quantity"]').value = 1;
+
+                    // Nếu API có trả giá nhập default thì set luôn
+                    if (u.price || u.Price || u.priceBuy || u.PriceBuy) {
+                        const priceVal = u.price || u.Price || u.priceBuy || u.PriceBuy;
+                        rows.row2.querySelector('input[name$=".ImportPrice"]').value = priceVal;
+                    }
+
+                    updateAmounts();
+                } catch (err) {
+                    console.error("Lỗi fetch GetUnitDetails:", err);
+                }
             }
         });
 
-        // ----------------- Thêm 2 hàng mới -----------------
-        document.querySelector('.btn-add-row').addEventListener('click', function () {
+        // ----- Thay đổi ngày nhập -> sinh lại BatchCode cho tất cả dòng -----
+        // Khi thay đổi NGÀY SẢN XUẤT hoặc NGÀY HẾT HẠN -> sinh lại BatchCode cho đúng dòng đó
+        $('#details-table').on(
+            'change',
+            'input[name$=".ManufacturingDate"], input[name$=".ExpirationData"]',
+            function () {
+                const row1 = this.closest('tr.detail-row');
+                if (!row1) return;
+
+                const index = parseInt(row1.dataset.index);
+                generateBatchCode(index);
+            }
+        );
+
+
+        // ----- Thêm 2 hàng mới -----
+        $('.btn-add-row').on('click', function () {
             const tableBody = document.querySelector('#details-table tbody');
             const rowIndex = tableBody.querySelectorAll('tr.detail-row').length;
 
@@ -479,8 +517,7 @@
     <td><input type="date" name="ProductDetails[${rowIndex}].ExpirationData" class="form-control" /></td>
     <td>
         <select name="ProductDetails[${rowIndex}].UnitProductId" class="form-control unit-select">
-            <option value="">Select Unit</option>
-            ${document.getElementById('unit-template').innerHTML}
+            <option value="">Đơn vị</option>
         </select>
     </td>
     <td><input type="number" name="ProductDetails[${rowIndex}].ConvertRate" class="form-control" /></td>
@@ -512,19 +549,34 @@
             updateAmounts();
         });
 
-        // Xóa 2 hàng của 1 item
-        detailsTable.addEventListener('click', function (e) {
-            if (e.target.classList.contains('btn-remove-row')) {
-                const row1 = e.target.closest('tr');
-                const index = row1.dataset.index;
-                const row2 = document.querySelector('#details-table tbody tr.detail-row-2[data-index="' + index + '"]');
-                if (row2) row2.remove();
-                row1.remove();
-                updateAmounts();
-            }
+        // ----- Xóa 2 hàng của 1 item -----
+        $('#details-table').on('click', '.btn-remove-row', function () {
+            const row1  = this.closest('tr');
+            const index = row1.dataset.index;
+            const row2  = document.querySelector('#details-table tbody tr.detail-row-2[data-index="' + index + '"]');
+            if (row2) row2.remove();
+            row1.remove();
+            updateAmounts();
+        });
+        // Khi thay đổi NGÀY SẢN XUẤT ở từng dòng -> sinh lại BatchCode cho đúng dòng đó
+        @* $('#details-table').on('change', 'input[name$=".ManufacturingDate"]', function () {
+            const row1 = this.closest('tr.detail-row');
+            if (!row1) return;
+
+            const index = parseInt(row1.dataset.index);
+            generateBatchCode(index);
         });
 
-        // Init select2 nếu sau này bạn muốn preload sẵn 1 dòng
+        $('#details-table').on('change', 'input[name$=".ManufacturingDate"]', function () {
+            const row1 = this.closest('tr.detail-row');
+            if (!row1) return;
+
+            const index = parseInt(row1.dataset.index);
+            generateBatchCode(index);
+        }); *@
+
+
+        // ----- Init select2 cho các dòng preload (nếu có) -----
         $(document).ready(function () {
             $('.product-select').select2({
                 placeholder: "Select Product",

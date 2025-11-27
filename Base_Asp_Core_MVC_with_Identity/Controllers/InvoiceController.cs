@@ -126,11 +126,12 @@ namespace Base_Asp_Core_MVC_with_Identity.Controllers
             ViewBag.account_lst = accountItems;
 
             // --------- khách hàng ----------
+            // --------- khách hàng (Tên + SĐT) ----------
             var customerList = (from p in _context.Customers
                                 select new
                                 {
                                     customerId = p.ID,
-                                    customerName = p.FullName,
+                                    displayName = p.FullName + " - " + p.PhoneNumber   // ⭐ THÊM SĐT ⭐
                                 }).ToList();
 
             var customerItems = new List<SelectListItem>();
@@ -138,11 +139,12 @@ namespace Base_Asp_Core_MVC_with_Identity.Controllers
             {
                 customerItems.Add(new SelectListItem
                 {
-                    Text = item.customerName,
+                    Text = item.displayName,                 // ⭐ HIỂN THỊ Tên + SĐT
                     Value = item.customerId.ToString()
                 });
             }
             ViewBag.customer_lst = customerItems;
+
 
             return View(viewModel);
         }

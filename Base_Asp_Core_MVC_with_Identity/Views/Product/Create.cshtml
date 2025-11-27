@@ -262,7 +262,7 @@
                     <input type="text" class="form-control mb-3 col-md-8" asp-for="productMaster.UserManual">
                     <span asp-validation-for="productMaster.UserManual" class="alert-danger"></span>
                 </div>
-                <div class="form-group col-md-6">
+                <div class="form-group col-md-6 d-none">
                     @Html.LabelFor(model => model.productMaster.Price, htmlAttributes: new { @class = "control-label col-md-4" })
                     <input type="number" class="form-control mb-3 col-md-8" asp-for="productMaster.Price">
                     <span asp-validation-for="productMaster.Price" class="alert-danger"></span>

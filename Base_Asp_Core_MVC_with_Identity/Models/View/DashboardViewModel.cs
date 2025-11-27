@@ -10,6 +10,7 @@
         public List<int> UserChartData { get; set; }
         public List<string> ChartLabels { get; set; }
         public List<ProductDetailViewModel> ProductDetails { get; set; }
+        public int ExpiryRangeDays { get; set; }
 
     }
 
