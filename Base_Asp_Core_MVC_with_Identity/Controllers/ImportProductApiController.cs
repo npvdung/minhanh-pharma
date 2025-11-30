@@ -22,7 +22,6 @@ namespace Base_Asp_Core_MVC_with_Identity.Controllers
         }
 
         [HttpGet]
-        [HttpGet]
         public IActionResult Index()
         {
             try
@@ -36,8 +35,10 @@ namespace Base_Asp_Core_MVC_with_Identity.Controllers
                 var searchValue = Request.Query["search[value]"].FirstOrDefault();
                 var fromDateStr = Request.Query["fromDate"].FirstOrDefault();
                 var toDateStr = Request.Query["toDate"].FirstOrDefault();
+
                 DateTime? fromDate = null;
                 DateTime? toDate = null;
+
                 if (!string.IsNullOrWhiteSpace(fromDateStr) &&
                     DateTime.TryParse(fromDateStr, out var fd))
                     fromDate = fd.Date;
@@ -49,7 +50,8 @@ namespace Base_Asp_Core_MVC_with_Identity.Controllers
                 int pageSize = length != null ? Convert.ToInt32(length) : 10;
                 int skip = start != null ? Convert.ToInt32(start) : 0;
 
-                // ************** QUERY CHÍNH - CÁCH 2 **************
+                // ************** QUERY CHÍNH – MỖI THUỐC 1 DÒNG **************
+                // Không group nữa, join trực tiếp Import + ImportDetail + Product + Supplier
                 var query =
                     from imp in _context.ImportsProduct
                     join d in _context.ImportProductDetails
@@ -61,44 +63,30 @@ namespace Base_Asp_Core_MVC_with_Identity.Controllers
                     join s in _context.suppliers
                         on p.SupplierId equals s.ID.ToString() into gs
                     from s in gs.DefaultIfEmpty()
-                    group new { imp, d, p, s } by new
-                    {
-                        imp.ID,
-                        imp.ImportCode,
-                        imp.ImportName,
-                        imp.ImportDate,
-                        imp.TotalAmount,
-                        imp.Status
-                    }
-                    into g
                     select new
                     {
-                        id = g.Key.ID,
-                        importCode = g.Key.ImportCode,
-                        importName = g.Key.ImportName,
-                        importDate = g.Key.ImportDate,
-                        totalAmount = g.Key.TotalAmount,
+                        // ID phiếu nhập (giữ nguyên để dùng cho nút Xem / Duyệt)
+                        id = imp.ID,
 
-                        // Lấy tên thuốc đầu tiên của phiếu nhập
-                        productName = g.Select(x => x.p.ProductName)
-                                        .Where(x => x != null)
-                                        .FirstOrDefault(),
+                        importCode = imp.ImportCode,
+                        importName = imp.ImportName,
+                        importDate = imp.ImportDate,
 
-                        // Lấy MÃ LÔ đầu tiên
-                        batchCode = g.Select(x => x.d.BatchCode)
-                                    .Where(x => x != null)
-                                    .FirstOrDefault(),
+                        // Mỗi dòng là 1 thuốc trong phiếu
+                        productName = p != null ? p.ProductName : "",
+                        batchCode = d != null ? d.BatchCode : "",
 
-                        // Lấy nhà cung cấp đúng từ bảng Supplier
-                        supplierName = g.Select(x => x.s.SupplierName)
-                                        .Where(x => !string.IsNullOrEmpty(x))
-                                        .Distinct()
-                                        .FirstOrDefault() ?? "",
+                        // Nhà cung cấp từ bảng suppliers
+                        supplierName = s != null ? s.SupplierName : "",
 
-                        status = g.Key.Status,
+                        // Tổng tiền theo từng dòng chi tiết
+                        totalAmount = d != null ? d.TotalAmount : 0,
+
+                        status = imp.Status,
                         approvedValue = (int)EnumApprodImport.approved
                     };
-                
+
+                // ---- Filter theo ngày ----
                 if (fromDate.HasValue)
                     query = query.Where(x => x.importDate >= fromDate.Value);
 
@@ -120,6 +108,7 @@ namespace Base_Asp_Core_MVC_with_Identity.Controllers
                 // ---- Sort ----
                 if (!string.IsNullOrEmpty(sortColumn))
                 {
+                    // sortColumn trùng với name trong DataTable (importCode, batchCode, productName, importDate, supplierName, totalAmount)
                     query = query.OrderBy($"{sortColumn} {sortDirection}");
                 }
 

@@ -31,10 +31,10 @@
     <h2>PHIẾU XUẤT KHO</h2>
     <h3>@Model.disposalRecordsMaster.ImportId</h3>
 
-    <div class="section-title">Thông tin phiếu trả</div>
+    <div class="section-title">Thông tin phiếu xuất kho</div>
     <table class="info-table">
         <tr>
-            <td class="info-label">Mã trả hàng:</td>
+            <td class="info-label">Mã xuất kho:</td>
             <td>@Model.disposalRecordsMaster.ImportId</td>
             <td class="info-label">Ngày trả:</td>
             <td>@Model.disposalRecordsMaster.ReturnDate?.ToString("dd/MM/yyyy HH:mm")</td>
@@ -42,7 +42,7 @@
         <tr>
             <td class="info-label">Người lập:</td>
             <td>@Model.disposalRecordsMaster.UserId</td>
-            <td class="info-label">Lí do trả:</td>
+            <td class="info-label">Lí do xuất:</td>
             <td>@Model.disposalRecordsMaster.Reason</td>
         </tr>
         <tr>
@@ -63,7 +63,7 @@
             <tr>
                 <th>STT</th>
                 <th>Tên sản phẩm</th>
-                <th>Mã lô</th>           @* <<< CỘT MÃ LÔ MỚI *@
+                <th>Mã lô</th>
                 <th>Đơn vị</th>
                 <th>Tỉ lệ</th>
                 <th>Số lượng</th>
@@ -78,11 +78,11 @@
         @foreach (var item in Model.ReturnsDetails)
         {
             <tr>
-                <td>@stt++</td>
-                <td>@item.ProductId</td>       @* text: Tên + HSD *@
-                <td>@item.ImportId</td>        @* text: MÃ LÔ *@
-                <td>@item.UnitProductId</td>   @* text: Đơn vị *@
-                <td>@item.Description</td>     @* tỉ lệ *@
+                <td>@(stt++)</td>
+                <td>@item.ProductId</td>       @* Tên + HSD (đã build ở controller) *@
+                <td>@item.ImportId</td>        @* Mã lô *@
+                <td>@item.UnitProductId</td>   @* Đơn vị *@
+                <td>@item.Description</td>     @* Tỉ lệ *@
                 <td>@item.Quantity</td>
                 <td class="text-right">@String.Format("{0:n0}", item.Price)</td>
                 <td class="text-right">@String.Format("{0:n0}", item.TotalAmount)</td>

@@ -378,8 +378,9 @@ namespace Base_Asp_Core_MVC_with_Identity.Controllers
                 string unitName = "";
                 string batchCode = "";
 
+                // QUAN TRỌNG: ProductId đang lưu ID lô (stocks.ID)
                 var stock = _context.stocks
-                                    .FirstOrDefault(s => s.ID.ToString() == d.ImportId);
+                                    .FirstOrDefault(s => s.ID.ToString() == d.ProductId);
 
                 if (stock != null)
                 {
@@ -387,11 +388,15 @@ namespace Base_Asp_Core_MVC_with_Identity.Controllers
                                         .FirstOrDefault(p => p.ID.ToString() == stock.ProductId);
 
                     var name = product?.ProductName ?? "";
-                    var batch = stock.ProductionBatch?.ToString("yyyy-MM-dd") ?? "";
-                    var exp = stock.ExpirationData?.ToString("yyyy-MM-dd") ?? "";
+                    var exp = stock.ExpirationData?.ToString("dd/MM/yyyy") ?? "";
 
-                    productDisplay = $"{name} - HSD: {exp}";
-                    batchCode = batch;
+                    // tên sản phẩm hiển thị: "Panadol - HSD: 30/11/2025"
+                    productDisplay = string.IsNullOrEmpty(exp)
+                        ? name
+                        : $"{name} - HSD: {exp}";
+
+                    // mã lô: dùng BatchCode trong bảng stocks
+                    batchCode = stock.BatchCode ?? "";
                 }
 
                 if (!string.IsNullOrEmpty(d.UnitProductId))
@@ -408,9 +413,9 @@ namespace Base_Asp_Core_MVC_with_Identity.Controllers
                     Quantity = d.Quantity,
                     TotalAmount = d.TotalAmount,
                     Price = d.Price,
-                    ProductId = productDisplay,
-                    UnitProductId = unitName,
-                    ImportId = batchCode
+                    ProductId = productDisplay,   // Tên + HSD
+                    UnitProductId = unitName,     // Đơn vị
+                    ImportId = batchCode          // Mã lô
                 });
             }
 

@@ -35,6 +35,7 @@ namespace Base_Asp_Core_MVC_with_Identity.Controllers
                 int skip = start != null ? Convert.ToInt32(start) : 0;
                 int recordsTotal = 0;
 
+                // ====== LẤY MASTER RETURN + TÊN KHÁCH HÀNG ======
                 var customerData = from r in _context.reSales
                                    join c in _context.Customers
                                        on r.CustomerId equals c.ID.ToString() into tempTable1
@@ -44,7 +45,8 @@ namespace Base_Asp_Core_MVC_with_Identity.Controllers
                                        r.ID,
                                        r.Sales,
                                        r.InvoiceDate,
-                                       r.Description,
+                                       r.Description,         // đang lưu ID hóa đơn gốc
+                                       r.Reason,              // LÍ DO TRẢ HÀNG (text)
                                        customName = tb1.FullName,
                                        r.TotalAmount
                                    };
@@ -58,7 +60,8 @@ namespace Base_Asp_Core_MVC_with_Identity.Controllers
                 {
                     customerData = customerData.Where(m =>
                         m.Sales.Contains(searchValue) ||
-                        m.customName.Contains(searchValue));
+                        m.customName.Contains(searchValue) ||
+                        m.Reason.Contains(searchValue));
                 }
 
                 recordsTotal = customerData.Count();
@@ -71,14 +74,14 @@ namespace Base_Asp_Core_MVC_with_Identity.Controllers
                 var batchDict = _context.reSalesDetail
                     .Where(d => masterIds.Contains(d.SaleId))
                     .Join(_context.stocks,
-                        d => d.ImportId,          // ID lô lưu trong chi tiết mua lại
+                        d => d.ImportId,          // ID lô lưu trong chi tiết trả
                         s => s.ID.ToString(),     // ID của Warehouse (stocks)
                         (d, s) => new
                         {
                             d.SaleId,
                             s.BatchCode
                         })
-                    .AsEnumerable()               // join xong thì chuyển sang join trên memory
+                    .AsEnumerable()
                     .GroupBy(x => x.SaleId)
                     .ToDictionary(
                         g => g.Key,
@@ -88,12 +91,13 @@ namespace Base_Asp_Core_MVC_with_Identity.Controllers
                 // Build dữ liệu trả về cho DataTables
                 var resultData = pageData.Select(item => new
                 {
-                    item.ID,
-                    item.Sales,
-                    item.InvoiceDate,
-                    item.Description,
-                    item.customName,
-                    item.TotalAmount,
+                    id = item.ID,
+                    sales = item.Sales,
+                    invoiceDate = item.InvoiceDate,
+                    description = item.Description, // ID hóa đơn gốc (nếu cần dùng sau này)
+                    reason = item.Reason,           // LÍ DO TRẢ HÀNG
+                    customName = item.customName,
+                    totalAmount = item.TotalAmount,
                     batchCode = batchDict.ContainsKey(item.ID.ToString())
                         ? batchDict[item.ID.ToString()]
                         : string.Empty

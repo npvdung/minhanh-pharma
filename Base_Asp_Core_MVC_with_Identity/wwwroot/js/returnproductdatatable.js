@@ -1,6 +1,57 @@
 ﻿$(document).ready(function () {
   // GIỮ LẠI BIẾN TABLE ĐỂ RELOAD
   var table = $("#customerDatatable").DataTable({
+    dom: "Bfrtip",
+    buttons: [
+      {
+        extend: "excelHtml5",
+        text: "Xuất báo cáo trả/huỷ hàng",
+        title: "Báo cáo trả/huỷ hàng",
+        exportOptions: {
+          // 0 = ID (ẩn), 1 = STT, 2 = Ngày xuất, 3 = Mã xuất,
+          // 4 = Mã lô, 5 = Lí do, 6 = Tổng tiền, 7-8 = nút
+          columns: [1, 2, 3, 4, 5, 6],
+          format: {
+            body: function (data, row, column, node) {
+              // Cột 6 trong DataTable là "Tổng tiền"
+              if (column === 6) {
+                if (data == null) return 0;
+
+                if (typeof data === "string") {
+                  // bỏ ký tự tiền tệ, dấu . ngăn nghìn
+                  data = data.replace(/[^\d,-]/g, "").replace(/\./g, "");
+                }
+
+                var num = parseFloat(data);
+                return isNaN(num) ? 0 : num;
+              }
+              return data;
+            },
+          },
+        },
+        customizeData: function (data) {
+          var idxTongTien = data.header.indexOf("Tổng tiền");
+          var total = 0;
+
+          data.body.forEach(function (row) {
+            var cell = row[idxTongTien] || "";
+            var digits = cell.toString().replace(/[^\d]/g, "");
+            if (digits) {
+              var value = parseInt(digits, 10);
+              if (!isNaN(value)) {
+                total += value;
+              }
+            }
+          });
+
+          var footerRow = new Array(data.header.length).fill("");
+          footerRow[0] = "Tổng cộng";
+          footerRow[idxTongTien] = total.toLocaleString("vi-VN") + " đ";
+          data.body.push(footerRow);
+        },
+      },
+    ],
+
     language: {
       sProcessing: "Đang xử lý...",
       sLengthMenu: "Hiển thị _MENU_ mục",
@@ -92,10 +143,33 @@
           }).format(data);
         },
       },
+
+      // Cột "In phiếu"
       {
-        targets: 1,
+        data: null,
+        width: "80px",
+        orderable: false,
+        searchable: false,
+        render: function (data, type, row) {
+          if (type === "display" && row && row.id) {
+            var Id = row.id;
+            // Mở view Print ở tab mới
+            return `<a href="/ReturnProduct/Print/${Id}" 
+                       target="_blank" 
+                       class="btn btn-outline-secondary btn-sm m-1">
+                        <i class="fa fa-print"></i>
+                    </a>`;
+          }
+          return "";
+        },
+      },
+
+      // Cột nút Xem
+      {
+        data: null,
         width: "50px",
         orderable: false,
+        searchable: false,
         render: function (data, type, row) {
           var Id = "";
           if (type === "display" && data !== null) {

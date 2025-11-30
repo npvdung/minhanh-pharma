@@ -4,6 +4,7 @@
 <link rel="stylesheet" href="node_modules/antd/dist/antd.css">
 <link href="~/css/datatable.css" rel="stylesheet" />
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+
 @if (TempData["ResultOk"] != null)
 {
     <div id="alert-div" class="alert alert-success position-fixed top-0 end-0 border border-success rounded-pill py-2 px-3" style="max-width: 450px;">
@@ -12,40 +13,44 @@
     </div>
 
     <script>
-        // Get the alert element
-        var alertDiv = document.getElementById("alert-div");
-
-        // Wait for 5 seconds and then hide the alert
         setTimeout(function () {
-            alertDiv.style.display = "none";
+            document.getElementById("alert-div").style.display = "none";
         }, 3000);
     </script>
 }
+
 <div class="header-section d-flex justify-content-between align-items-center my-3">
     <h2 class="text-cam fw-bold">Danh sách người mua trả lại thuốc</h2>
     <a asp-controller="ReSalse" asp-action="Create" class="btn btn-cam">Thêm đơn hàng trả</a>
 </div>
+
 <div class="table-responsive table-section">
     <table id="customerDatatable" class="table table-bordered table-hover custom-table" cellspacing="0" width="100%">
         <thead class="table-header text-white bg-cam">
             <tr>
                 <th>ID</th>
                 <th>STT</th>
-                <th>Mã Trả HĐ</th>
-                <th>Mã lô</th> 
+                <th>Mã trả hàng</th>
+                <th>Mã lô</th>
                 <th>Ngày trả</th>
                 <th>Tên khách hàng</th>
+                <th>Lí do trả</th>   @* <-- CỘT MỚI *@
                 <th>Tổng tiền</th>
                 <th></th>
-                @*<th></th>*@
-                @*<th></th>*@
             </tr>
         </thead>
     </table>
 </div>
-@section Scripts
-    {
+
+@section Scripts {
     <script src="~/lib/datatables/js/jquery.dataTables.min.js"></script>
     <script src="~/lib/datatables/js/dataTables.bootstrap4.min.js"></script>
+
+    <!-- Buttons -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.1/css/buttons.dataTables.min.css" />
+    <script src="https://cdn.datatables.net/buttons/2.4.1/js/dataTables.buttons.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.html5.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+
     <script src="~/js/reSalesdatatable.js"></script>
 }
