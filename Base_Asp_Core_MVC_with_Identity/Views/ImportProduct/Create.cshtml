@@ -217,7 +217,7 @@
                     <input type="text" class="form-control" asp-for="ImportMaster.ImportCode">
                     <span asp-validation-for="ImportMaster.ImportCode" class="alert-danger"></span>
                 </div>
-                <div class="form-group col-md-6">
+                <div class="form-group col-md-6 d-none">
                     @Html.LabelFor(model => model.ImportMaster.ImportName, htmlAttributes: new { @class = "control-label" })
                     <input type="text" class="form-control" asp-for="ImportMaster.ImportName">
                     <span asp-validation-for="ImportMaster.ImportName" class="alert-danger"></span>

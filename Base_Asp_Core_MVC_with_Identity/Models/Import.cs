@@ -12,9 +12,8 @@ namespace Base_Asp_Core_MVC_with_Identity.Models
         [Display(Name = "Mã phiếu nhập")]
         public string ImportCode { get; set; }
 
-        [Required]
         [Display(Name = "Tên thuốc nhập")]
-        public string ImportName { get; set; }
+        public string? ImportName { get; set; }
 
         [Display(Name = "Ngày nhập hàng")]
         public DateTime? ImportDate { get; set; }
