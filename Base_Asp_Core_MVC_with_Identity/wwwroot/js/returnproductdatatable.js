@@ -76,6 +76,7 @@
     processing: true,
     serverSide: true,
     filter: true,
+    order: [[3, "desc"]],
     ajax: {
       url: "/api/ReturnProductApi",
       type: "GET",

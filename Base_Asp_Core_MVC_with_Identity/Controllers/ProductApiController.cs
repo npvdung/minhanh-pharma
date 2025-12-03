@@ -52,6 +52,11 @@ namespace Base_Asp_Core_MVC_with_Identity.Controllers
                                        tempcustomer.Ingredient,
                                    };
 
+                if (string.IsNullOrEmpty(sortColumn))
+                {
+                    sortColumn = "ProductCode";
+                    sortColumnDirection = "desc";
+                }
                 if (!(string.IsNullOrEmpty(sortColumn) && string.IsNullOrEmpty(sortColumnDirection)))
                 {
                     customerData = customerData.OrderBy(sortColumn + " " + sortColumnDirection);

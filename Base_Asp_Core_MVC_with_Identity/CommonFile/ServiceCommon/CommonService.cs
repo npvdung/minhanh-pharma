@@ -13,30 +13,47 @@ namespace Base_Asp_Core_MVC_with_Identity.CommonFile.ServiceCommon
             _context = context;
         }
 
-        public string GenerateCategoryCode<T>(string prefix, Expression<Func<T, string>> codeSelector) where T : class
+        public string GenerateCategoryCode<T>(
+            string prefix,
+            Expression<Func<T, string>> codeSelector
+        ) where T : class
         {
-            var existingCodes = _context.Set<T>().Select(codeSelector).ToList();
-            string newCode = prefix + GenerateUniqueSuffix(existingCodes);
-            return newCode;
-        }
+            // 1. lấy ngày hiện tại
+            var today = DateTime.Now.ToString("yyyyMMdd");
 
-        private string GenerateUniqueSuffix(List<string> existingCodes)
-        {
-            var random = new Random();
-            const string chars = "ABCDE123456789";
-            var suffixBuilder = new StringBuilder();
-            for (int i = 0; i < 4; i++)
+            // 2. prefix chuẩn: ORDER_20251119_
+            var datePrefix = $"{prefix}{today}_";
+
+            // 3. lấy DbSet tương ứng
+            var dbSet = _context.Set<T>();
+
+            // 4. lấy tất cả code bắt đầu bằng "ORDER_20251119_"
+            var existingCodes = dbSet
+                .Select(codeSelector)
+                .Where(code => code.StartsWith(datePrefix))
+                .ToList();
+
+            // 5. lấy số thứ tự lớn nhất
+            int maxSeq = 0;
+
+            foreach (var code in existingCodes)
             {
-                suffixBuilder.Append(chars[random.Next(chars.Length)]);
-            }
-            string suffix = suffixBuilder.ToString();
+                // tách phần cuối: ORDER_20251119_0001 → 0001
+                var parts = code.Split('_');
+                var seqStr = parts.LastOrDefault();
 
-            while (existingCodes.Contains(suffix))
-            {
-                suffix = GenerateUniqueSuffix(existingCodes);
+                if (int.TryParse(seqStr, out int seq))
+                {
+                    if (seq > maxSeq)
+                        maxSeq = seq;
+                }
             }
 
-            return suffix;
+            // 6. số mới = max + 1
+            int newSeq = maxSeq + 1;
+
+            // 7. ghép chuỗi hoàn chỉnh: ORDER_20251119_0001
+            return $"{datePrefix}{newSeq:D4}";
         }
     }
 }

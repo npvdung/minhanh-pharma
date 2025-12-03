@@ -55,6 +55,7 @@
     processing: true,
     serverSide: true,
     filter: true,
+    order: [[2, "desc"]],
     ajax: {
       url: "/api/InvoiceApi",
       type: "GET",
@@ -81,7 +82,7 @@
           return meta.row + meta.settings._iDisplayStart + 1;
         },
       },
-      { data: "invoiceCode" },
+      { data: "invoiceCode", name: "InvoiceCode" },
       {
         data: "invoiceDate",
         render: function (data) {

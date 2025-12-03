@@ -37,19 +37,39 @@ namespace Base_Asp_Core_MVC_with_Identity.Controllers
                 int skip = start != null ? Convert.ToInt32(start) : 0;
 
                 // ============================
-                // JOIN đầy đủ, BỔ SUNG BatchCode
+                // JOIN đầy đủ: Stocks + Product + Supplier + ImportDetail + Import (ImportCode)
                 // ============================
                 var query =
                     from stock in _context.stocks
-                    join product in _context.Products on stock.ProductId equals product.ID.ToString() into prodJoin
+
+                    // Product
+                    join product in _context.Products
+                        on stock.ProductId equals product.ID.ToString() into prodJoin
                     from prod in prodJoin.DefaultIfEmpty()
 
-                    join supplier in _context.suppliers on prod.SupplierId equals supplier.ID.ToString() into supJoin
+                    // Supplier
+                    join supplier in _context.suppliers
+                        on prod.SupplierId equals supplier.ID.ToString() into supJoin
                     from sup in supJoin.DefaultIfEmpty()
+
+                    // Import detail: match theo ProductId + BatchCode
+                    join detail in _context.ImportProductDetails
+                        on new { ProdId = stock.ProductId, Batch = stock.BatchCode }
+                        equals new { ProdId = detail.ProduceId, Batch = detail.BatchCode } into detailJoin
+                    from detail in detailJoin.DefaultIfEmpty()
+
+                    // Import master: lấy ImportCode
+                    join imp in _context.ImportsProduct
+                        on detail.ImportProductId equals imp.ID.ToString() into impJoin
+                    from imp in impJoin.DefaultIfEmpty()
 
                     select new
                     {
                         id = stock.ID,
+
+                        // Mã nhập hàng
+                        importCode = imp != null ? imp.ImportCode : string.Empty,
+
                         productName = prod.ProductName,
                         batchCode = stock.BatchCode,
                         supplierName = sup.SupplierName,
@@ -70,6 +90,7 @@ namespace Base_Asp_Core_MVC_with_Identity.Controllers
                 if (!string.IsNullOrEmpty(searchValue))
                 {
                     query = query.Where(m =>
+                        m.importCode.Contains(searchValue) || 
                         m.productName.Contains(searchValue) ||
                         m.supplierName.Contains(searchValue) ||
                         m.batchCode.Contains(searchValue)

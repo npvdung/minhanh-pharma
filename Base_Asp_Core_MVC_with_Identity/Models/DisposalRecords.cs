@@ -4,14 +4,18 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Base_Asp_Core_MVC_with_Identity.Models
 {
+     
     public class DisposalRecords
     {
         [Key]
         [Display(Name = "Mã phiếu hủy")]
         public Guid ID { get; set; }
+         
+        
+
 
         [Required]
-        [Display(Name = "Lô nhập (Import ID)")]
+        [Display(Name = "Mã xuất kho")]
         public string ImportId { get; set; }
 
         [Required]

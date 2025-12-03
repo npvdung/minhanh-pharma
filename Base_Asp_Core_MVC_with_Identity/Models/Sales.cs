@@ -1,11 +1,15 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 namespace Base_Asp_Core_MVC_with_Identity.Models
 {
+     
     public class Sales
     {
         [Key]
         [Display(Name = "Mã hóa đơn")]
         public Guid ID { get; set; }
+         
+        
+
 
         [Required]
         [Display(Name = "Số hóa đơn")]

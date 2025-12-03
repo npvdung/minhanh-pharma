@@ -30,6 +30,92 @@ namespace Base_Asp_Core_MVC_with_Identity.Controllers
             _commonService = commonService;
         }
 
+                // ========================= HÀM DÙNG CHUNG: Đổ dropdown cho màn Create =========================
+        private void PopulateInvoiceDropdowns()
+        {
+            // --------- danh sách sản phẩm trong kho (THEO LÔ) ----------
+            var productList = (from p in _context.stocks
+                               join s in _context.Products on p.ProductId equals s.ID.ToString()
+                               select new
+                               {
+                                   ProductId = p.ProductId,                         // ID sản phẩm gốc
+                                   ImportId = p.ID.ToString(),                     // ID của Warehouse (lô)
+                                   Name = s.ProductName,
+                                   BatchCode = p.BatchCode,                        // MÃ LÔ
+                                   Price = s.Price.HasValue
+                                       ? s.Price.Value.ToString("C", new CultureInfo("vi-VN"))
+                                       : "0",
+                                   Total = p.QuantityInStock,
+                                   ExpirationData = p.ExpirationData.HasValue
+                                       ? p.ExpirationData.Value.ToString("yyyy-MM-dd")
+                                       : null
+                               }).ToList();
+
+            var itemData = new List<SelectListItem>();
+            foreach (var item in productList)
+            {
+                // hiển thị luôn MÃ LÔ, HSD, SL tồn
+                itemData.Add(new SelectListItem
+                {
+                    Text = $"{item.Name} - HSD: {item.ExpirationData} - Lô: {item.BatchCode} - Giá: {item.Price} - SL tồn: {item.Total}",
+                    Value = item.ImportId   // chọn theo ID của Warehouse (lô)
+                });
+            }
+            ViewBag.product_lst = itemData;
+
+            // --------- đơn vị tính ----------
+            var unitProduct = _context.productUnits.ToList();
+            var unitItems = new List<SelectListItem>();
+            foreach (var item in unitProduct)
+            {
+                unitItems.Add(new SelectListItem
+                {
+                    Text = item.UnitName,
+                    Value = item.ID.ToString()
+                });
+            }
+            ViewBag.unit_lst = unitItems;
+
+            // --------- tài khoản người lập hóa đơn ----------
+            var accountData = (from p in _userManager.Users
+                               select new
+                               {
+                                   Id = p.Id,
+                                   Name = p.FirstName + " " + p.LastName,
+                               }).ToList();
+
+            var accountItems = new List<SelectListItem>();
+            foreach (var item in accountData)
+            {
+                accountItems.Add(new SelectListItem
+                {
+                    Text = item.Name,
+                    Value = item.Id
+                });
+            }
+            ViewBag.account_lst = accountItems;
+
+            // --------- khách hàng (Tên + SĐT) ----------
+            var customerList = (from p in _context.Customers
+                                select new
+                                {
+                                    customerId = p.ID,
+                                    displayName = p.FullName + " - " + p.PhoneNumber
+                                }).ToList();
+
+            var customerItems = new List<SelectListItem>();
+            foreach (var item in customerList)
+            {
+                customerItems.Add(new SelectListItem
+                {
+                    Text = item.displayName,
+                    Value = item.customerId.ToString()
+                });
+            }
+            ViewBag.customer_lst = customerItems;
+        }
+
+
         public Base_Asp_Core_MVC_with_IdentityContext Get_context()
         {
             return _context;
@@ -155,6 +241,46 @@ namespace Base_Asp_Core_MVC_with_Identity.Controllers
         [Authorize(Roles = "Admin, Employee")]
         public IActionResult Create(InvoiceViewModel empobj)
         {
+                    // ===== CHECK SỐ LƯỢNG KHÔNG VƯỢT QUÁ TỒN KHO (ĐÃ QUY ĐỔI) =====
+            foreach (var item in empobj.salesProductsDetails)
+            {
+                if (string.IsNullOrWhiteSpace(item.ProductId))
+                    continue;
+
+                // ProductId ở form là ID lô (Warehouse.ID)
+                if (!Guid.TryParse(item.ProductId, out Guid stockId))
+                    continue;
+
+                var stockItem = _context.stocks.Find(stockId);
+                if (stockItem == null)
+                    continue;
+
+                var quantity = item.Quantity ?? 0;
+
+                // Description đang lưu tỉ lệ (ConvertRate)
+                int rate = 1;
+                int.TryParse(item.Description, out rate);
+
+                // SL yêu cầu (quy về đơn vị nhỏ nhất)
+                var requestedBase = quantity * rate;
+                // SL tồn (đã là đơn vị nhỏ nhất)
+                var availableBase = stockItem.QuantityInStock ?? 0;
+
+                if (requestedBase > availableBase)
+                {
+                    ModelState.Clear();
+                    ModelState.AddModelError(string.Empty,
+                        "Số lượng vượt quá số lượng thuốc tồn kho, vui lòng chọn lại");
+
+                    // đổ lại dropdown cho View
+                    PopulateInvoiceDropdowns();
+
+                    // trả lại màn hình tạo hoá đơn, giữ nguyên dữ liệu user nhập
+                    return View(empobj);
+                }
+            }
+        // ============================================================
+
             // thêm vào bảng master
             var master = new Sales
             {
@@ -199,6 +325,7 @@ namespace Base_Asp_Core_MVC_with_Identity.Controllers
             _context.SaveChanges();
 
             // cập nhật lại kho (trừ số lượng đã bán theo từng lô)
+                // cập nhật lại kho (trừ số lượng đã bán theo từng lô)
             foreach (var item in details)
             {
                 var stockItem = _context.stocks
@@ -206,10 +333,19 @@ namespace Base_Asp_Core_MVC_with_Identity.Controllers
                 if (stockItem == null) continue;
 
                 // Description = tỉ lệ (ConvertRate)
-                stockItem.QuantityInStock =
-                    stockItem.QuantityInStock - (item.Quantity * int.Parse(item.Description));
+                int rate = 1;
+                int.TryParse(item.Description, out rate);
+
+                var current = stockItem.QuantityInStock ?? 0;
+                var decrease = (item.Quantity ?? 0) * rate;
+
+                stockItem.QuantityInStock = current - decrease;
+                if (stockItem.QuantityInStock < 0)
+                    stockItem.QuantityInStock = 0;
+
                 _context.stocks.Update(stockItem);
             }
+
 
             _context.SaveChanges();
             TempData["ResultOk"] = "Tạo dữ liệu thành công !";

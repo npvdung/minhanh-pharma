@@ -133,6 +133,12 @@
         border-radius: 4px;
         font-size: 14px;
     }
+    .validation-summary-valid {
+        display: none;
+    }
+    .validation-summary-errors {
+        display: block;
+    }
 
     #details-table th:first-child,
     #details-table td:first-child {
@@ -153,6 +159,7 @@
     <div class="form-container">
         <h2 class="form-title">Trả hàng nhà cung cấp</h2>
         <form method="post" id="import-form">
+            <div asp-validation-summary="All" class="alert alert-danger"></div>
             <!-- Master Section -->
             <div class="row">
                 <div class="form-group col-md-6">

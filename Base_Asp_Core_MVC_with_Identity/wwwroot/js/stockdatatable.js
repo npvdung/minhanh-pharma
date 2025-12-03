@@ -7,7 +7,7 @@
         text: "Xuất báo cáo tồn kho",
         title: "Danh sách tồn kho",
         exportOptions: {
-          columns: [1, 2, 3, 4, 5, 6, 7],
+          columns: [1, 2, 3, 4, 5, 6, 7, 8],
         },
       },
     ],
@@ -29,6 +29,7 @@
     processing: true,
     serverSide: true,
     filter: true,
+    order: [[2, "desc"]],
     ajax: {
       url: "/api/StockApi",
       type: "GET",
@@ -47,7 +48,7 @@
           return meta.row + meta.settings._iDisplayStart + 1;
         },
       },
-
+      { data: "importCode", name: "importCode" },
       { data: "productName", name: "productName" },
       { data: "batchCode", name: "batchCode" },
       { data: "supplierName", name: "supplierName" },

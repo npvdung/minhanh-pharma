@@ -3,10 +3,14 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Base_Asp_Core_MVC_with_Identity.Models
 {
+     
     public class Import
     {
         [Key]
         public Guid ID { get; set; }
+         
+        
+
 
         [Required]
         [Display(Name = "Mã phiếu nhập")]

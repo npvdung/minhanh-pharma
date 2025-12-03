@@ -1,11 +1,17 @@
 ﻿
 
+using System.ComponentModel.DataAnnotations.Schema;
+using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations;
 namespace Base_Asp_Core_MVC_with_Identity.Models
 {
     public class Category
     {
         [Key]
         public Guid ID { get; set; }
+         
+        
+
         [Required]
         [Display(Name = "Mã loại thuốc")]
         public string CategoryCode { get; set; }

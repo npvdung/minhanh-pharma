@@ -18,6 +18,7 @@
     processing: true,
     serverSide: true,
     filter: true,
+    order: [[2, "desc"]],
     ajax: {
       url: "/api/CategoryApi",
       type: "GET",

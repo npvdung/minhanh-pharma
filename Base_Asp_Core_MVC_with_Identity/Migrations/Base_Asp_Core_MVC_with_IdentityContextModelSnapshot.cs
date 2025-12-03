@@ -42,7 +42,7 @@ namespace Base_Asp_Core_MVC_with_Identity.Migrations
                     b.Property<DateTime?>("DateOfBirth")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime(6)")
-                        .HasDefaultValue(new DateTime(2025, 12, 1, 11, 11, 50, 358, DateTimeKind.Local).AddTicks(8400));
+                        .HasDefaultValue(new DateTime(2025, 12, 3, 20, 29, 20, 30, DateTimeKind.Local).AddTicks(2400));
 
                     b.Property<string>("Email")
                         .HasMaxLength(256)

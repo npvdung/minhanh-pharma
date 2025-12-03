@@ -2,11 +2,13 @@
 
 namespace Base_Asp_Core_MVC_with_Identity.Models
 {
+     
     public class ImportProducts
     {
         [Key]
         public Guid ID { get; set; }
-        public string? ImportProductId { get; set; }
+         
+                public string? ImportProductId { get; set; }
         [Required]
         [Display(Name = "Tên sản phẩm")]
         public string? ProduceId { get; set; }

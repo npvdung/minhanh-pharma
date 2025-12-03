@@ -131,6 +131,96 @@ namespace Base_Asp_Core_MVC_with_Identity.Controllers
         [Authorize(Roles = "Admin, Employee")]
         public IActionResult Create(ReturnViewModel empobj)
         {
+                // ===== CHECK SỐ LƯỢNG KHÔNG VƯỢT QUÁ TỒN KHO (ĐÃ QUY ĐỔI) =====
+            foreach (var item in empobj.ReturnsDetails)
+            {
+                if (string.IsNullOrWhiteSpace(item.ProductId))
+                    continue;
+
+                // ProductId trên form là ID lô (stocks.ID)
+                if (!Guid.TryParse(item.ProductId, out Guid stockId))
+                    continue;
+
+                var stockLot = _context.stocks.Find(stockId);
+                if (stockLot == null)
+                    continue;
+
+                var quantity = item.Quantity ?? 0;
+
+                // Description đang lưu tỉ lệ quy đổi
+                int rate = 1;
+                int.TryParse(item.Description, out rate);
+
+                var requestedBase = quantity * rate;                 // SL yêu cầu (đơn vị nhỏ nhất)
+                var availableBase = stockLot.QuantityInStock ?? 0;   // SL tồn (đơn vị nhỏ nhất)
+
+                if (requestedBase > availableBase)
+                {
+                    // Xoá các lỗi ModelState cũ (Required...) để chỉ còn lỗi tồn kho
+                    ModelState.Clear();
+                    ModelState.AddModelError(string.Empty,
+                        "Số lượng vượt quá số lượng thuốc tồn kho, vui lòng chọn lại");
+
+                    // Đổ lại dropdown giống Create GET
+                    var productList = (from w in _context.stocks
+                                    join p in _context.Products on w.ProductId equals p.ID.ToString()
+                                    select new
+                                    {
+                                        ImportId = w.ID.ToString(),
+                                        ProductName = p.ProductName,
+                                        BatchCode = w.ProductionBatch,
+                                        ExpirationData = w.ExpirationData,
+                                        Quantity = w.QuantityInStock
+                                    }).ToList();
+
+                    var productItems = new List<SelectListItem>();
+                    foreach (var pr in productList)
+                    {
+                        var exp = pr.ExpirationData?.ToString("yyyy-MM-dd") ?? "";
+                        productItems.Add(new SelectListItem
+                        {
+                            Text = $"{pr.ProductName} - Lô: {pr.BatchCode} - HSD: {exp} - SL tồn: {pr.Quantity}",
+                            Value = pr.ImportId
+                        });
+                    }
+                    ViewData["product_lst"] = productItems;
+
+                    var unitProduct = _context.productUnits.ToList();
+                    var unitItems = new List<SelectListItem>();
+                    foreach (var u in unitProduct)
+                    {
+                        unitItems.Add(new SelectListItem
+                        {
+                            Text = u.UnitName,
+                            Value = u.ID.ToString()
+                        });
+                    }
+                    ViewData["unit_lst"] = unitItems;
+
+                    var accountData = (from u in _userManager.Users
+                                    select new
+                                    {
+                                        Id = u.Id,
+                                        Name = u.FirstName + " " + u.LastName
+                                    }).ToList();
+
+                    var accountItems = new List<SelectListItem>();
+                    foreach (var acc in accountData)
+                    {
+                        accountItems.Add(new SelectListItem
+                        {
+                            Text = acc.Name,
+                            Value = acc.Id
+                        });
+                    }
+                    ViewData["account_lst"] = accountItems;
+
+                    // Giữ nguyên dữ liệu người dùng nhập
+                    return View(empobj);
+                }
+            }
+            // ============================================================
+
             // sinh lại mã đề phòng user sửa trong form
             string prefix = "RET_";
             Expression<Func<DisposalRecords, string>> codeSelector = c => c.ImportId;

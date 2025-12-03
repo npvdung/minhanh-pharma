@@ -1,9 +1,14 @@
-﻿namespace Base_Asp_Core_MVC_with_Identity.Models
+﻿using System.ComponentModel.DataAnnotations.Schema;
+
+namespace Base_Asp_Core_MVC_with_Identity.Models
 {
+     
     public class Customer
     {
         [Key]
         public Guid ID { get; set; }
+         
+        
 
         [Display(Name = "Mã khách hàng")]
         //[Required(ErrorMessage = "Mã khách hàng là bắt buộc.")]

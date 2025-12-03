@@ -1,11 +1,17 @@
 ﻿using MessagePack;
+using System.ComponentModel.DataAnnotations.Schema;
+
 
 namespace Base_Asp_Core_MVC_with_Identity.Models
 {
+     
     public class Supplier
     {
         [Key]
         public Guid ID { get; set; }
+         
+        
+
         [Display(Name = "Mã nhà cung cấp")]
         [Required(ErrorMessage = "Mã nhà cung cấp là bắt buộc.")]
         public string SupplierCode { get; set; }

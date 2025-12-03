@@ -1,5 +1,5 @@
 ﻿$(document).ready(function () {
-  $("#customerDatatable").DataTable({
+  var table = $("#customerDatatable").DataTable({
     dom: "Bfrtip",
     buttons: [
       {
@@ -82,11 +82,17 @@
     processing: true,
     serverSide: true,
     filter: true,
+    order: [[2, "desc"]],
     ajax: {
       url: "/api/ReSalseApi",
       type: "GET",
       datatype: "json",
       dataSrc: "data",
+      // Gửi thêm khoảng ngày trả lên API
+      data: function (d) {
+        d.fromDate = $("#fromDate").val();
+        d.toDate = $("#toDate").val();
+      },
     },
 
     columnDefs: [
@@ -177,6 +183,18 @@
       [5, 10, 20, 50, 100],
     ],
     pageLength: 5,
+  });
+  var filterContainer = $("#customerDatatable_filter");
+  if (filterContainer.length && $("#dateFilterWrapper").length) {
+    filterContainer.prepend($("#dateFilterWrapper"));
+    filterContainer.css("display", "flex");
+    filterContainer.css("gap", "12px");
+    filterContainer.find("label").css("margin-bottom", "0");
+  }
+
+  // Khi đổi khoảng ngày -> reload lại bảng
+  $("#fromDate, #toDate").on("change", function () {
+    table.ajax.reload();
   });
 });
 

@@ -1,12 +1,18 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+
 
 namespace Base_Asp_Core_MVC_with_Identity.Models
 {
+     
     public class Warehouse
     {
         [Key]
         [Display(Name = "Mã định danh")]
         public Guid ID { get; set; }
+         
+        
+
 
         [Display(Name = "Sản phẩm")]
         public string ProductId { get; set; }
