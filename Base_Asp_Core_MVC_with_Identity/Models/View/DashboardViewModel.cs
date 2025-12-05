@@ -24,6 +24,7 @@ namespace Base_Asp_Core_MVC_with_Identity.Models.View
         public int? QuantitySold { get; set; }
         [Column(TypeName = "decimal(18,0)")]
         public decimal? Price { get; set; }
+        public string BatchCode { get; set; }
         public DateTime? ExpirationDate { get; set; }
     }
 }

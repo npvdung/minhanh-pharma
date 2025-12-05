@@ -334,12 +334,24 @@
         }
 
         // Khi nhập số lượng / giá -> cập nhật lại tiền
-        document.querySelector('#details-table').addEventListener('input', function (e) {
-            if (!e.target.name) return;
-            if (e.target.name.includes('.Quantity') || e.target.name.includes('.Price')) {
+        // Khi nhập Số lượng / Giá bán -> chặn âm + cập nhật tiền
+        $('#details-table').on(
+            'input',
+            'input[name$=".Quantity"], input[name$=".Price"]',
+            function () {
+                // Không cho nhập âm cho cả Số lượng & Giá
+                if (this.name.endsWith('.Quantity') || this.name.endsWith('.Price')) {
+                    const val = parseFloat(this.value);
+                    if (!isNaN(val) && val < 0) {
+                        alert('Giá trị không được âm');
+                        this.value = 0;
+                    }
+                }
+
                 updateAmounts();
             }
-        });
+        );
+
 
         // --------- THÊM DÒNG CHI TIẾT ---------
         document.querySelector('.btn-add-row').addEventListener('click', function () {

@@ -382,9 +382,24 @@
         }
 
         // ----- Khi nhập Số lượng / Giá nhập -----
-        $('#details-table').on('input', 'input[name$=".Quantity"], input[name$=".ImportPrice"]', function () {
-            updateAmounts();
-        });
+        // ----- Khi nhập Số lượng / Giá nhập -----
+        $('#details-table').on(
+            'input',
+            'input[name$=".Quantity"], input[name$=".ImportPrice"]',
+            function () {
+                // Nếu là ô SỐ LƯỢNG thì không cho âm
+                if (this.name.endsWith('.Quantity') || this.name.endsWith('.ImportPrice')) {
+                    const val = parseFloat(this.value);
+                    if (!isNaN(val) && val < 0) {
+                        alert('Số lượng không được âm');
+                        this.value = 0;
+                    }
+                }
+
+                updateAmounts();
+            }
+        );
+
 
         // ----- Khi chọn SẢN PHẨM hoặc ĐƠN VỊ (giống ReturnProduct) -----
         $('#details-table').on('change', 'select', async function (e) {
@@ -467,15 +482,16 @@
                     const u = await response.json();
                     console.log("Unit details:", u);
 
-                    // Tỉ lệ
+                    // Chỉ lấy TỈ LỆ từ sản phẩm
                     rows.row1.querySelector('input[name$=".ConvertRate"]').value = u.rate || u.Rate || 1;
-                    // Auto số lượng = 1
+
+                    // Auto số lượng = 1 cho tiện
                     rows.row2.querySelector('input[name$=".Quantity"]').value = 1;
 
-                    // Nếu API có trả giá nhập default thì set luôn
-                    if (u.price || u.Price || u.priceBuy || u.PriceBuy) {
-                        const priceVal = u.price || u.Price || u.priceBuy || u.PriceBuy;
-                        rows.row2.querySelector('input[name$=".ImportPrice"]').value = priceVal;
+                    // KHÔNG set giá nhập từ sản phẩm nữa – để trống cho user nhập tay
+                    const importPriceInput = rows.row2.querySelector('input[name$=".ImportPrice"]');
+                    if (importPriceInput) {
+                        importPriceInput.value = "";
                     }
 
                     updateAmounts();
@@ -483,6 +499,7 @@
                     console.error("Lỗi fetch GetUnitDetails:", err);
                 }
             }
+
         });
 
         // ----- Thay đổi ngày nhập -> sinh lại BatchCode cho tất cả dòng -----

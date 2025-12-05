@@ -183,6 +183,7 @@
             <thead>
                 <tr>
                     <th>Tên sản phẩm</th>
+                    <th>Mã lô</th> 
                     <th>Số lượng tồn</th>
                     <th>Ngày hết hạn</th>
                 </tr>
@@ -192,6 +193,7 @@
                 {
                     <tr>
                         <td>@item.ProductName</td>
+                        <td>@item.BatchCode</td>
                         <td>@item.QuantitySold</td>
                         <td>@item.ExpirationDate?.ToString("dd/MM/yyyy")</td>
                     </tr>

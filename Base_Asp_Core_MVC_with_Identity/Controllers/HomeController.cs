@@ -90,7 +90,8 @@ namespace Base_Asp_Core_MVC_with_Identity.Controllers
                                     ProductId = tempdata.ID.ToString(),
                                     ProductName = tb1.ProductName,
                                     QuantitySold = tempdata.QuantityInStock,
-                                    ExpirationDate = tempdata.ExpirationData
+                                    ExpirationDate = tempdata.ExpirationData,
+                                    BatchCode      = tempdata.BatchCode
                                 })
                                 .ToList();
 

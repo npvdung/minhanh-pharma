@@ -334,12 +334,23 @@
         $('#TotalAmountMaster').val(totalAmountMaster.toFixed(0));
     }
 
-    document.querySelector('#details-table').addEventListener('input', function (e) {
-        if (e.target.matches('input[name$=".Quantity"]') ||
-            e.target.matches('input[name$=".Price"]')) {
+    // Khi nhập Số lượng / Giá bán -> chặn âm + cập nhật tiền
+    $('#details-table').on(
+        'input',
+        'input[name$=".Quantity"], input[name$=".Price"]',
+        function () {
+            if (this.name.endsWith('.Quantity') || this.name.endsWith('.Price')) {
+                const val = parseFloat(this.value);
+                if (!isNaN(val) && val < 0) {
+                    alert('Giá trị không được âm');
+                    this.value = 0;
+                }
+            }
+
             updateAmounts();
         }
-    });
+    );
+
 
     document.querySelector('.btn-add-row').addEventListener('click', function () {
         const tableBody = document.querySelector('#details-table tbody');
