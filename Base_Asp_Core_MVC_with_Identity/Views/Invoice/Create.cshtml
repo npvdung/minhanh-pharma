@@ -460,40 +460,50 @@
             }
 
             // ----- CHỌN ĐƠN VỊ -> LẤY TỈ LỆ + GIÁ BÁN -----
+            // ----- CHỌN ĐƠN VỊ -> LẤY TỈ LỆ + GIÁ BÁN TỪ PRODUCT -----
             else if (target.name.includes('.UnitProductId')) {
                 const unitId = target.value;
                 if (!unitId) return;
 
-                const productSelect = row.querySelector('select[name$=".ProductId"]');
-                const stockId = productSelect ? productSelect.value : null; // ID lô
-                if (!stockId) return;
-
                 try {
-                    // DÙNG LẠI API: GetUnitDetailsByStock
-                    const url = `/api/ImportProductApi/GetUnitDetailsByStock?stockId=${encodeURIComponent(stockId)}&unitId=${encodeURIComponent(unitId)}`;
+                    // gọi API mới: lấy tỉ lệ + GIÁ BÁN theo đơn vị, KHÔNG phụ thuộc lô
+                    const url = `/api/ImportProductApi/GetUnitSaleDetails/${encodeURIComponent(unitId)}`;
                     const response = await fetch(url);
-                    if (response.ok) {
-                        const details = await response.json();
 
-                        // Description = tỉ lệ (convertRate)
-                        row.querySelector('input[name$=".Description"]').value =
-                            details.rate ?? '';
-
-                        // Default số lượng = 1
-                        row.querySelector('input[name$=".Quantity"]').value = 1;
-
-                        // Giá bán: ưu tiên price (giá bán theo đơn vị) -> priceBuy
-                        row.querySelector('input[name$=".Price"]').value =
-                            details.price ?? details.priceBuy ?? 0;
-
-                        updateAmounts();
-                    } else {
-                        console.error('GetUnitDetailsByStock error', response.status);
+                    if (!response.ok) {
+                        console.error('GetUnitSaleDetails error', response.status);
+                        return;
                     }
+
+                    const details = await response.json();
+
+                    // Description = tỉ lệ (convertRate)
+                    const rateInput = row.querySelector('input[name$=".Description"]');
+                    if (rateInput) {
+                        rateInput.value = details.rate ?? '';
+                    }
+
+                    // Nếu số lượng đang rỗng hoặc <= 0 thì đặt = 1
+                    const qtyInput = row.querySelector('input[name$=".Quantity"]');
+                    if (qtyInput) {
+                        const currentQty = parseFloat(qtyInput.value);
+                        if (isNaN(currentQty) || currentQty <= 0) {
+                            qtyInput.value = 1;
+                        }
+                    }
+
+                    // GIÁ BÁN = giá bán cấu hình trong Product (productUnits.Price)
+                    const priceInput = row.querySelector('input[name$=".Price"]');
+                    if (priceInput) {
+                        priceInput.value = details.price ?? 0;
+                    }
+
+                    updateAmounts();
                 } catch (err) {
                     console.error(err);
                 }
             }
+
         });
 
         // --------- KHỞI TẠO SELECT2 BAN ĐẦU ---------

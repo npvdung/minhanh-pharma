@@ -129,6 +129,28 @@ namespace Base_Asp_Core_MVC_with_Identity.Controllers
                 return BadRequest("Lỗi server API ImportProductApi: " + ex.Message);
             }
         }
+        // LẤY TỈ LỆ + GIÁ BÁN THEO ĐƠN VỊ (dùng cho màn bán hàng Invoice)
+        // URL: /api/ImportProductApi/GetUnitSaleDetails/{unitId}
+        [HttpGet("GetUnitSaleDetails/{unitId}")]
+        public IActionResult GetUnitSaleDetails(string unitId)
+        {
+            var unit = _context.productUnits
+                .Where(u => u.ID.ToString() == unitId)
+                .Select(u => new
+                {
+                    rate  = u.Rate,   // Tỉ lệ
+                    price = u.PriceBuy  // GIÁ BÁN – cột "Giá bán" ở Product/Edit
+                })
+                .FirstOrDefault();
+
+            if (unit == null)
+            {
+                return NotFound("Unit not found");
+            }
+
+            return Ok(unit);
+        }
+
 
         // ========================= UNITS API =========================
 
